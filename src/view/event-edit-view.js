@@ -8,7 +8,7 @@ function editEventTemplate(event, destinations, offers) {
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
   const currentDestionation = destinations.find((destination) => destination.id === event.destination);
-  const eventId = event.id || 0;
+  const eventId = event.id;
   const { name, description, pictures } = currentDestionation || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);

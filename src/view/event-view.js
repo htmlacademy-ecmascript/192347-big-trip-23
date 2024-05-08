@@ -7,9 +7,9 @@ function createEventTemplate(event, destinations, offers) {
 
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
-  const currentDestionation = destinations.find((destination) => destination.id === event.destination);
+  const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const dateAttribute = formatDate(dateFrom, DateFormat.ATTRIBUTE_DATE);
-  const evebtDate = formatDate(dateFrom, DateFormat.DATE);
+  const eventDate = formatDate(dateFrom, DateFormat.DATE);
   const dateTimeAttributeFrom = formatDate(dateFrom, DateFormat.ATTRIBUTE_DATE_TIME);
   const eventTimeFrom = formatDate(dateFrom, DateFormat.TIME);
   const eventTimeTo = formatDate(dateTo, DateFormat.TIME);
@@ -20,11 +20,11 @@ function createEventTemplate(event, destinations, offers) {
     `
     <li class="trip-events__item">
               <div class="event">
-                <time class="event__date" datetime="${dateAttribute}">${evebtDate}</time>
+                <time class="event__date" datetime="${dateAttribute}">${eventDate}</time>
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
-                <h3 class="event__title">${type} ${currentDestionation.name}</h3>
+                <h3 class="event__title">${type} ${currentDestination.name}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
                     <time class="event__start-time" datetime="${dateTimeAttributeFrom}">${eventTimeFrom}</time>

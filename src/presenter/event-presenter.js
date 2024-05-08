@@ -26,9 +26,5 @@ export default class EventPresenter {
     for (const event of events) {
       render(new EventItemView(event, destinations, offers), this.eventListComponent.getElement());
     }
-    // что лучше использовать?
-    // events.forEach((event) => {
-    //   render(new EventItemView(event, destinations, offers), this.eventListComponent.getElement());
-    // });
   }
 }

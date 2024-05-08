@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-const duration = require('dayjs/plugin/duration'); // eslint ругается на require
+import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 const DateFormat = {
@@ -30,16 +30,16 @@ function countDuaration(dateFrom, dateTo) {
   const duaration = [];
 
   if (days > 0) {
-    duaration.push(dayjs.duration(diffMilliseconds, 'milliseconds').format(DateFormat.DAY));
+    duaration.push(dayjs(diffMilliseconds).format(DateFormat.DAY));
   }
   if (hours === 0 && days > 0) {
-    duaration.push(dayjs.duration(diffMilliseconds, 'milliseconds').format(DateFormat.HOUR));
+    duaration.push(dayjs(diffMilliseconds).format(DateFormat.HOUR));
   }
   if (minutes >= 0) {
-    duaration.push(dayjs.duration(diffMilliseconds, 'milliseconds').format(DateFormat.MINUTE));
-  }
+    duaration.push(dayjs(diffMilliseconds).format(DateFormat.MINUTE));
 
-  return duaration.join(' ');
+    return duaration.join(' ');
+  }
 }
 
 function capitalizeFirstLetter(str) {

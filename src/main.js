@@ -9,7 +9,6 @@ const controlsFiltersElemet = tripMainElement.querySelector('.trip-controls__fil
 const tripEventsElement = pageBodyElement.querySelector('.trip-events');
 
 const eventModel = new EventModel();
-eventModel.init();
 
 const eventPresenter = new EventPresenter({container: tripEventsElement, eventModel});
 const headerPresenter = new HeaderPresenter({container: tripMainElement});
