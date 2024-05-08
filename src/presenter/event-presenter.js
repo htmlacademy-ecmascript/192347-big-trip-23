@@ -1,33 +1,30 @@
 import EventListView from '../view/event-list-view';
-import EventItemView from '../view/event-item-view';
-import EditEventItemView from '../view/event-item-edit-view';
-import { render, RenderPosition } from '../render';
+import EventItemView from '../view/event-view';
+import SortView from '../view/sort-view';
+import { render } from '../render';
+import { getDefaultEvent } from '../const';
+import EditEventView from '../view/event-edit-view';
 
 export default class EventPresenter {
   eventListComponent = new EventListView;
+  eventSortComponent = new SortView;
 
-  constructor({container}) {
+  constructor({ container, eventModel }) {
     this.container = container;
-  }
-
-  renderEventList() {
-    render(this.eventListComponent, this.container);
-  }
-
-  renderEditEventItem() {
-    render(new EditEventItemView, this.eventListComponent.getElement(), RenderPosition.AFTERBEGIN);
-  }
-
-  renderEventItem() {
-    render(new EventItemView, this.eventListComponent.getElement());
+    this.eventModel = eventModel;
   }
 
   init() {
-    this.renderEventList();
-    this.renderEditEventItem();
+    render(this.eventSortComponent, this.container);
+    render(this.eventListComponent, this.container);
+    const events = this.eventModel.getEvents();
+    const destinations = this.eventModel.getDestinations();
+    const offers = this.eventModel.getOffers();
 
-    for (let i = 0; i < 3; i++) {
-      this.renderEventItem();
+    render(new EditEventView(getDefaultEvent(), destinations, offers), this.eventListComponent.getElement());
+    render(new EditEventView(events[1], destinations, offers), this.eventListComponent.getElement());
+    for (const event of events) {
+      render(new EventItemView(event, destinations, offers), this.eventListComponent.getElement());
     }
   }
 }
