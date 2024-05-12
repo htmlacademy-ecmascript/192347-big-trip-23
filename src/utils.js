@@ -38,7 +38,7 @@ function countDuration(dateFrom, dateTo) {
   if (minutes >= 0) {
     eventDuration.push(dayjs(diffMilliseconds).format(DateFormat.MINUTE));
 
-    return duration.join(' ');
+    return eventDuration.join(' ');
   }
 }
 
