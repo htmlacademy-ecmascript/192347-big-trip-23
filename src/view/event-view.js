@@ -1,10 +1,9 @@
-import { createElement } from '../render.js';
-import { DateFormat, formatDate, countDuaration } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { DateFormat, formatDate, countDuration } from '../utils.js';
 
 
 function createEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type, isFavorite } = event;
-
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
@@ -14,7 +13,7 @@ function createEventTemplate(event, destinations, offers) {
   const eventTimeFrom = formatDate(dateFrom, DateFormat.TIME);
   const eventTimeTo = formatDate(dateTo, DateFormat.TIME);
   const dateTimeAttributeTo = formatDate(dateTo, DateFormat.ATTRIBUTE_DATE_TIME);
-  const eventDuration = countDuaration(dateFrom, event.dateTo);
+  const eventDuration = countDuration(dateFrom, event.dateTo);
 
   return (
     `
@@ -61,27 +60,20 @@ function createEventTemplate(event, destinations, offers) {
   );
 }
 
-export default class EventView {
+export default class EventView extends AbstractView{
+  #event = null;
+  #destinations = null;
+  #offers = null;
+
   constructor(event, destinations, offers) {
-    this.event = event;
-    this.destinations = destinations;
-    this.offers = offers;
+    super();
+    this.#event = event;
+    this.#destinations = destinations;
+    this.#offers = offers;
 
   }
 
-  getTemplate() {
-    return createEventTemplate(this.event, this.destinations, this.offers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventTemplate(this.#event, this.#destinations, this.#offers);
   }
 }

@@ -17,7 +17,7 @@ function formatDate(date, dateFormat) {
   return dayjs(date).format(dateFormat);
 }
 
-function countDuaration(dateFrom, dateTo) {
+function countDuration(dateFrom, dateTo) {
   const start = dayjs(dateFrom);
   const end = dayjs(dateTo);
 
@@ -27,18 +27,18 @@ function countDuaration(dateFrom, dateTo) {
   const hours = dayjs.duration(diffMilliseconds).hours();
   const minutes = dayjs.duration(diffMilliseconds).minutes();
 
-  const duaration = [];
+  const eventDuration = [];
 
   if (days > 0) {
-    duaration.push(dayjs(diffMilliseconds).format(DateFormat.DAY));
+    eventDuration.push(dayjs(diffMilliseconds).format(DateFormat.DAY));
   }
   if (hours === 0 && days > 0) {
-    duaration.push(dayjs(diffMilliseconds).format(DateFormat.HOUR));
+    eventDuration.push(dayjs(diffMilliseconds).format(DateFormat.HOUR));
   }
   if (minutes >= 0) {
-    duaration.push(dayjs(diffMilliseconds).format(DateFormat.MINUTE));
+    eventDuration.push(dayjs(diffMilliseconds).format(DateFormat.MINUTE));
 
-    return duaration.join(' ');
+    return duration.join(' ');
   }
 }
 
@@ -46,4 +46,4 @@ function capitalizeFirstLetter(str) {
   return str.replace(str[0], str[0].toUpperCase());
 }
 
-export { DateFormat, formatDate, countDuaration, capitalizeFirstLetter };
+export { DateFormat, formatDate, countDuration, capitalizeFirstLetter };
