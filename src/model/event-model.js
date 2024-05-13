@@ -11,11 +11,11 @@ export default class EventModel {
     return this.#events;
   }
 
-  get destinations() {
-    return this.#destinations;
-  }
-
   get offers() {
     return this.#offers;
+  }
+
+  get destinations() {
+    return this.#destinations;
   }
 }

@@ -118,15 +118,41 @@ export default class EditEventView extends AbstractView {
   #event = null;
   #destinations = null;
   #offers = null;
+  #submitHandler = null;
+  #cancelHandler = null;
 
-  constructor(event, destinations, offers) {
+
+  constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
     super();
     this.#event = event;
     this.#destinations = destinations;
     this.#offers = offers;
+    this.#submitHandler = onFormSubmit;
+    this.#cancelHandler = onFormCancel;
+
+    this.element.addEventListener('submit', this.#onFormSubmit);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelForm);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancelForm);
   }
 
   get template() {
     return editEventTemplate(this.#event, this.#destinations, this.#offers);
   }
+
+  removeElement() {
+    super.removeElement();
+    this.element.removeEventListener('submit', this.#onFormSubmit);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancelForm);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancelForm);
+  }
+
+  #onFormSubmit = (evt) => {
+    evt.preventDefault();
+    this.#submitHandler();
+  };
+
+  #onCancelForm = (evt) => {
+    evt.preventDefault();
+    this.#submitHandler();
+  };
 }

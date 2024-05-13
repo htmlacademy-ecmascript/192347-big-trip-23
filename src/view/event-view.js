@@ -1,8 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { DateFormat, formatDate, countDuration } from '../utils.js';
 
-
-function createEventTemplate(event, destinations, offers) {
+function createEventTemplate(event, offers, destinations) {
   const { basePrice, dateFrom, dateTo, type, isFavorite } = event;
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
@@ -60,20 +59,35 @@ function createEventTemplate(event, destinations, offers) {
   );
 }
 
-export default class EventView extends AbstractView{
+export default class EventView extends AbstractView {
   #event = null;
   #destinations = null;
   #offers = null;
+  #clickHandler = null;
+  #rollupButton = null;
 
-  constructor(event, destinations, offers) {
+  constructor({event, destinations, offers, onEditClick}) {
     super();
     this.#event = event;
     this.#destinations = destinations;
     this.#offers = offers;
-
+    this.#clickHandler = onEditClick;
+    this.#rollupButton = this.element.querySelector('.event__rollup-btn');
+    this.#rollupButton.addEventListener('click', this.#onClick);
   }
 
   get template() {
-    return createEventTemplate(this.#event, this.#destinations, this.#offers);
+    return createEventTemplate(this.#event, this.#offers, this.#destinations);
   }
+
+  removeElement() {
+    super.removeElement();
+    this.#rollupButton.removeEventListener('click', this.#onClick);
+  }
+
+  #onClick = (evt) => {
+    evt.preventDefault();
+    this.#clickHandler();
+
+  };
 }
