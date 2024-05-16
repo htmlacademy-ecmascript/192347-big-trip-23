@@ -1,15 +1,14 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
 
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type } = event;
-
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
-  const currentDestionation = destinations.find((destination) => destination.id === event.destination);
+  const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const eventId = event.id;
-  const { name, description, pictures } = currentDestionation || {};
+  const { name, description, pictures } = currentDestination || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
@@ -96,7 +95,7 @@ function editEventTemplate(event, destinations, offers) {
       </div>
       </section>`
       : ''}
-    ${currentDestionation ? (
+    ${currentDestination ? (
       `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${description}</p>
@@ -115,27 +114,45 @@ function editEventTemplate(event, destinations, offers) {
   );
 }
 
-export default class EditEventView {
-  constructor(event, destinations, offers) {
-    this.event = event;
-    this.destinations = destinations;
-    this.offers = offers;
+export default class EditEventView extends AbstractView {
+  #event = null;
+  #destinations = null;
+  #offers = null;
+  #handlerSubmit = null;
+  #handlerCancel = null;
 
+
+  constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
+    super();
+    this.#event = event;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#handlerSubmit = onFormSubmit;
+    this.#handlerCancel = onFormCancel;
+
+    this.element.addEventListener('submit', this.#submitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#cancelHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#cancelHandler);
   }
 
-  getTemplate() {
-    return editEventTemplate(this.event, this.destinations, this.offers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get template() {
+    return editEventTemplate(this.#event, this.#destinations, this.#offers);
   }
 
   removeElement() {
-    this.element = null;
+    super.removeElement();
+    this.element.removeEventListener('submit', this.#submitHandler);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#cancelHandler);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#cancelHandler);
   }
+
+  #submitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerSubmit();
+  };
+
+  #cancelHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerCancel();
+  };
 }

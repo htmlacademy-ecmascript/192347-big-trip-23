@@ -1,18 +1,15 @@
 import TripInfoView from '../view/trip-info-view';
-import { render, RenderPosition } from '../render';
+import { render, RenderPosition } from '../framework/render';
 
 export default class HeaderPresenterPresenter {
-  tripInfoComponent = new TripInfoView;
+  #tripInfoComponent = new TripInfoView();
+  #container = null;
 
   constructor({container}) {
-    this.container = container;
-  }
-
-  renderTripInfo() {
-    render(this.tripInfoComponent, this.container, RenderPosition.AFTERBEGIN);
+    this.#container = container;
   }
 
   init() {
-    this.renderTripInfo();
+    render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 }

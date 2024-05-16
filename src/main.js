@@ -5,14 +5,14 @@ import HeaderPresenter from './presenter/header-presenter.js';
 
 const pageBodyElement = document.querySelector('.page-body');
 const tripMainElement = pageBodyElement.querySelector('.trip-main');
-const controlsFiltersElemet = tripMainElement.querySelector('.trip-controls__filters');
+const controlsFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = pageBodyElement.querySelector('.trip-events');
 
 const eventModel = new EventModel();
 
 const eventPresenter = new EventPresenter({container: tripEventsElement, eventModel});
 const headerPresenter = new HeaderPresenter({container: tripMainElement});
-const filterPresenter = new FilterPresenter({container: controlsFiltersElemet});
+const filterPresenter = new FilterPresenter({container: controlsFiltersElement});
 
 eventPresenter.init();
 headerPresenter.init();
