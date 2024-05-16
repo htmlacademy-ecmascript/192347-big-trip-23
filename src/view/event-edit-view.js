@@ -118,8 +118,8 @@ export default class EditEventView extends AbstractView {
   #event = null;
   #destinations = null;
   #offers = null;
-  #submitHandler = null;
-  #cancelHandler = null;
+  #handlerSubmit = null;
+  #handlerCancel = null;
 
 
   constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
@@ -127,32 +127,31 @@ export default class EditEventView extends AbstractView {
     this.#event = event;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#submitHandler = onFormSubmit;
-    this.#cancelHandler = onFormCancel;
+    this.#handlerSubmit = onFormSubmit;
+    this.#handlerCancel = onFormCancel;
 
-    this.element.addEventListener('submit', this.#onFormSubmit);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelForm);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancelForm);
+    this.element.addEventListener('submit', this.#submitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#cancelHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#cancelHandler);
   }
 
   get template() {
     return editEventTemplate(this.#event, this.#destinations, this.#offers);
   }
-
   removeElement() {
     super.removeElement();
-    this.element.removeEventListener('submit', this.#onFormSubmit);
-    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancelForm);
-    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancelForm);
+    this.element.removeEventListener('submit', this.#submitHandler);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#cancelHandler);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#cancelHandler);
   }
 
-  #onFormSubmit = (evt) => {
+  #submitHandler = (evt) => {
     evt.preventDefault();
-    this.#submitHandler();
+    this.#handlerSubmit();
   };
 
-  #onCancelForm = (evt) => {
+  #cancelHandler = (evt) => {
     evt.preventDefault();
-    this.#submitHandler();
+    this.#handlerCancel();
   };
 }
