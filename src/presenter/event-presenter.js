@@ -33,7 +33,7 @@ export default class EventPresenter {
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;
-    
+
     const onEscKeydown = (evt) => {
       if (evt.key === 'Escape') {
         evt.preventDefault();

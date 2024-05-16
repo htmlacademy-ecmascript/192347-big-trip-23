@@ -138,6 +138,7 @@ export default class EditEventView extends AbstractView {
   get template() {
     return editEventTemplate(this.#event, this.#destinations, this.#offers);
   }
+
   removeElement() {
     super.removeElement();
     this.element.removeEventListener('submit', this.#submitHandler);
