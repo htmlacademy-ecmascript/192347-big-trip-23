@@ -10,9 +10,22 @@ const tripEventsElement = pageBodyElement.querySelector('.trip-events');
 
 const eventModel = new EventModel();
 
-const eventPresenter = new EventPresenter({container: tripEventsElement, eventModel});
-const headerPresenter = new HeaderPresenter({container: tripMainElement});
-const filterPresenter = new FilterPresenter({container: controlsFiltersElement});
+const eventPresenter = new EventPresenter(
+  {
+    container: tripEventsElement,
+    eventModel
+  }
+);
+const headerPresenter = new HeaderPresenter(
+  {
+    container: tripMainElement
+  }
+);
+const filterPresenter = new FilterPresenter(
+  {
+    container: controlsFiltersElement,
+    eventModel
+  });
 
 eventPresenter.init();
 headerPresenter.init();

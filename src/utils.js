@@ -1,17 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { DateFormat } from './const';
 dayjs.extend(duration);
-
-const DateFormat = {
-  DATE: 'MMM DD',
-  TIME: 'HH:mm',
-  ATTRIBUTE_DATE_TIME: 'YYYY-MM-DDTHH:mm',
-  ATTRIBUTE_DATE: 'YYYY-MM-DD',
-  EDIT_DATE_TIME: 'DD/MM/YY HH:mm',
-  DAY: 'DD[D]',
-  HOUR: 'HH[H]',
-  MINUTE: 'mm[M]'
-};
 
 function formatDate(date, dateFormat) {
   return dayjs(date).format(dateFormat);
@@ -46,4 +36,7 @@ function capitalizeFirstLetter(str) {
   return str.replace(str[0], str[0].toUpperCase());
 }
 
-export { DateFormat, formatDate, countDuration, capitalizeFirstLetter };
+
+const isEmpty = (list) => list.length === 0;
+
+export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty};
