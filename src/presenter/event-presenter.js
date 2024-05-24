@@ -3,6 +3,9 @@ import EventView from '../view/event-view';
 import SortView from '../view/sort-view';
 import { render, replace } from '../framework/render';
 import EditEventView from '../view/event-edit-view';
+import EmptyListView from '../view/empty-list-view';
+import { isEmpty } from '../utils';
+import { DEFAULT_SORT_TYPE, DEFAULT_FILTER_TYPE } from '../const';
 
 export default class EventPresenter {
   #container = null;
@@ -12,20 +15,31 @@ export default class EventPresenter {
   constructor({ container, eventModel }) {
     this.#container = container;
     this.#eventModel = eventModel;
+
     this.#eventListComponent = new EventListView();
   }
 
   init() {
-    this.#renderSortView();
     this.#renderEventListView(this.#eventModel);
   }
 
   #renderSortView() {
-    render(new SortView(), this.#container);
+    render(new SortView({ sortTypes: this.#eventModel.sortTypes, currentSortType: DEFAULT_SORT_TYPE }), this.#container);
+  }
+
+  #renderEmptyView() {
+    render(new EmptyListView({ filterTypes: DEFAULT_FILTER_TYPE }), this.#container);
   }
 
   #renderEventListView() {
     const events = this.#eventModel.events;
+
+    if (isEmpty(events)) {
+      this.#renderEmptyView();
+      return;
+    }
+
+    this.#renderSortView();
     render(this.#eventListComponent, this.#container);
     events.forEach((event) => this.#renderEventItemView(event));
   }
