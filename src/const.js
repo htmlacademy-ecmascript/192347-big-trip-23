@@ -23,7 +23,9 @@ const getDefaultEvent = () => ({
   type: 'flight'
 });
 
+
 const SORT_TYPES = ['day', 'event', 'time', 'price', 'offers'];
+const DEFAULT_SORT_TYPE = SORT_TYPES[0];
 
 const FilterTypes = {
   EVERYTHING: 'everything',
@@ -31,6 +33,8 @@ const FilterTypes = {
   PAST: 'past',
   PRESENT: 'present',
 };
+
+const DEFAULT_FILTER_TYPE = FilterTypes[-1];
 
 const EventEmptyListMessages = {
   [FilterTypes.EVERYTHING]: 'Click New Event to create your first point',
@@ -50,4 +54,13 @@ const DateFormat = {
   MINUTE: 'mm[M]'
 };
 
-export {EVENT_TYPES, getDefaultEvent, SORT_TYPES, FilterTypes, EventEmptyListMessages, DateFormat};
+export {
+  EVENT_TYPES,
+  getDefaultEvent,
+  SORT_TYPES,
+  FilterTypes,
+  EventEmptyListMessages,
+  DateFormat,
+  DEFAULT_SORT_TYPE,
+  DEFAULT_FILTER_TYPE
+};

@@ -1,22 +1,23 @@
 import FilterView from '../view/filter-view';
 import { render } from '../framework/render';
+import { DEFAULT_FILTER_TYPE } from '../const';
 
 export default class FilterPresenterPresenter {
-  // #filterComponent = new FilterView();
   #container = null;
-  #eventModel = null;
+  #filterModel = null;
 
-  constructor({ container, eventModel }) {
+  constructor({ container, filterModel }) {
     this.#container = container;
-    this.#eventModel = eventModel;
+    this.#filterModel = filterModel;
   }
 
   #renderFilters(filterTypes) {
-    render(new FilterView({ filterTypes, currentFilter: filterTypes[-1] }), this.#container);
+    render(new FilterView({ filterTypes, currentFilter: DEFAULT_FILTER_TYPE }), this.#container);
   }
 
+
   init() {
-    this.#renderFilters(this.#eventModel.filterTypes);
+    this.#renderFilters(this.#filterModel.filterTypes);
   }
 
 }

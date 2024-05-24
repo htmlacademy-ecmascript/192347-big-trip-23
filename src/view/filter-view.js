@@ -1,19 +1,21 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { FilterTypes } from '../const.js';
 
-const calculateChecked = (isChecked) => isChecked ? 'checked' : '';
+const filterTypes = Object.values(FilterTypes);
+const getCheckedClass = (isChecked) => isChecked ? 'checked' : '';
 
 function createFilterItemTemplate(value, isChecked) {
   return (
     `
     <div class="trip-filters__filter">
-    <input id="filter-${value}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${value}" ${calculateChecked(isChecked)}>
+    <input id="filter-${value}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${value}" ${getCheckedClass(isChecked)}>
     <label class="trip-filters__filter-label" for="filter-${value}">${value}</label>
     </div>
     `
   );
 }
 
-function createFilterTemplate(filterTypes, currentFilter) {
+function createFilterTemplate(currentFilter) {
   return (
     `
     <form class="trip-filters" action="#" method="get">
@@ -25,16 +27,14 @@ function createFilterTemplate(filterTypes, currentFilter) {
 }
 
 export default class FilterView extends AbstractView {
-  #filterTypes = [];
   #currentFilter = '';
 
-  constructor({filterTypes, currentFilter}) {
+  constructor({ currentFilter }) {
     super();
-    this.#filterTypes = filterTypes;
     this.#currentFilter = currentFilter;
   }
 
   get template() {
-    return createFilterTemplate(this.#filterTypes, this.#currentFilter);
+    return createFilterTemplate(filterTypes, this.#currentFilter);
   }
 }

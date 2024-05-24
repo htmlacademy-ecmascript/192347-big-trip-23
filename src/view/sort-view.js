@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { SORT_TYPES } from '../const.js';
 
 function createSortItemTemplate(type, isChecked) {
   return (
@@ -11,25 +12,23 @@ function createSortItemTemplate(type, isChecked) {
   );
 }
 
-function createSortTemplate(sortTypes, currentSortType) {
+function createSortTemplate(currentSortType) {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${sortTypes.map((type) => createSortItemTemplate(type, type === currentSortType)).join('')}
+    ${SORT_TYPES.map((type) => createSortItemTemplate(type, type === currentSortType)).join('')}
   </form>`
   );
 }
 
 export default class SortView extends AbstractView {
-  #sortTypes = [];
   #currentSortType = '';
 
-  constructor({sortTypes, currentSortType}) {
+  constructor({currentSortType}) {
     super();
-    this.#sortTypes = sortTypes;
     this.#currentSortType = currentSortType;
   }
 
   get template() {
-    return createSortTemplate(this.#sortTypes, this.#currentSortType);
+    return createSortTemplate(SORT_TYPES, this.#currentSortType);
   }
 }
