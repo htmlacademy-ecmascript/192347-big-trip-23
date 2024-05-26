@@ -39,4 +39,7 @@ function capitalizeFirstLetter(str) {
 
 const isEmpty = (list) => list.length === 0;
 
-export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty};
+const updateData = (data, update) => data.map((item) => item.id === update.id ? update : item);
+const updateItem = (item, prop) => ({ ...item, ...prop });
+
+export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem };

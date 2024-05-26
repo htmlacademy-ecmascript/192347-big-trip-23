@@ -1,72 +1,83 @@
-import EventListView from '../view/event-list-view';
 import EventView from '../view/event-view';
-import SortView from '../view/sort-view';
 import { render, replace } from '../framework/render';
 import EditEventView from '../view/event-edit-view';
-import EmptyListView from '../view/empty-list-view';
-import { isEmpty } from '../utils';
-import { DEFAULT_SORT_TYPE, DEFAULT_FILTER_TYPE } from '../const';
+import { updateItem } from '../utils';
+import { Mode } from '../const';
 
 export default class EventPresenter {
   #container = null;
   #eventModel = null;
-  #eventListComponent = null;
+  #event = null;
 
-  constructor({ container, eventModel }) {
+  #eventItemView = null;
+  #editEventView = null;
+
+  #tripEventChangeHandler = null;
+  #handleEditMode = null;
+
+  #mode = Mode.DEFAULT;
+
+  constructor({ container, eventModel, onEventUpdate, onEditMode }) {
     this.#container = container;
     this.#eventModel = eventModel;
-
-    this.#eventListComponent = new EventListView();
+    this.#tripEventChangeHandler = onEventUpdate;
+    this.#handleEditMode = onEditMode;
   }
 
-  init() {
-    this.#renderEventListView(this.#eventModel);
+  init(event) {
+    this.#event = event;
+    this.#renderEventItemView(event);
   }
 
-  #renderSortView() {
-    render(new SortView({ sortTypes: this.#eventModel.sortTypes, currentSortType: DEFAULT_SORT_TYPE }), this.#container);
-  }
-
-  #renderEmptyView() {
-    render(new EmptyListView({ filterTypes: DEFAULT_FILTER_TYPE }), this.#container);
-  }
-
-  #renderEventListView() {
-    const events = this.#eventModel.events;
-
-    if (isEmpty(events)) {
-      this.#renderEmptyView();
-      return;
+  resetView() {
+    if (this.#mode === Mode.EDIT) {
+      this.#switchToViewMode();
     }
-
-    this.#renderSortView();
-    render(this.#eventListComponent, this.#container);
-    events.forEach((event) => this.#renderEventItemView(event));
   }
+
+  #switchToEditMode() {
+    this.#handleEditMode();
+    replace(this.#editEventView, this.#eventItemView);
+    document.addEventListener('keydown', this.#onEscKeydown);
+    this.#mode = Mode.EDIT;
+  }
+
+  #switchToViewMode() {
+    replace(this.#eventItemView, this.#editEventView);
+    document.removeEventListener('keydown', this.#onEscKeydown);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #onEscKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#switchToViewMode();
+    }
+  };
 
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;
 
-    const onEscKeydown = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        switchToViewMode();
-      }
-    };
+    const prevEventView = this.#eventItemView;
 
-    const onEditClick = () => switchToEditMode();
-    const onFormSubmit = () => switchToViewMode();
-    const onFormCancel = () => switchToViewMode();
 
-    const eventItemView = new EventView({
+    const onEditClick = () => this.#switchToEditMode();
+    const onFormSubmit = () => this.#switchToViewMode();
+    const onFormCancel = () => this.#switchToViewMode();
+
+    this.#eventItemView = new EventView({
       event,
       offers,
       destinations,
       onEditClick: onEditClick,
+      onFavoriteClick: () => {
+        const updatedEvent = updateItem(event, { isFavorite: !event.isFavorite });
+        this.#tripEventChangeHandler(updatedEvent);
+      }
     });
 
-    const editEventView = new EditEventView({
+    this.#editEventView = new EditEventView({
       event,
       offers,
       destinations,
@@ -74,14 +85,10 @@ export default class EventPresenter {
       onFormCancel: onFormCancel,
     });
 
-    function switchToEditMode() {
-      replace(editEventView, eventItemView);
-      document.addEventListener('keydown', onEscKeydown);
+    if (prevEventView === null) {
+      render(this.#eventItemView, this.#container);
+      return;
     }
-    function switchToViewMode() {
-      replace(eventItemView, editEventView);
-      document.removeEventListener('keydown', onEscKeydown);
-    }
-    render(eventItemView, this.#eventListComponent.element);
+    replace(this.#eventItemView, prevEventView);
   }
 }

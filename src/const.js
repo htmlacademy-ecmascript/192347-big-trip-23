@@ -54,6 +54,11 @@ const DateFormat = {
   MINUTE: 'mm[M]'
 };
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDIT: 'EDIT',
+};
+
 export {
   EVENT_TYPES,
   getDefaultEvent,
@@ -62,5 +67,6 @@ export {
   EventEmptyListMessages,
   DateFormat,
   DEFAULT_SORT_TYPE,
-  DEFAULT_FILTER_TYPE
+  DEFAULT_FILTER_TYPE,
+  Mode,
 };
