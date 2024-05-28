@@ -3,17 +3,20 @@ import { destinations } from '../mock/destination';
 import { offers } from '../mock/offers';
 import { SORT_TYPES } from '../const';
 
-
 export default class EventModel {
   #events = events;
   #destinations = destinations;
   #offers = offers;
   #sortTypes = SORT_TYPES;
 
-
   get events() {
     return this.#events;
   }
+
+  set events(tripEvents) {
+    this.#events = [...tripEvents];
+  }
+
 
   get offers() {
     return this.#offers;

@@ -44,7 +44,7 @@ function createEventTemplate(event, offers, destinations) {
                   </li>`
     )).join('')}
                 </ul>
-                <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''} " type="button">
+                <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
                   <span class="visually-hidden">Add to favorite</span>
                   <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                     <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -63,17 +63,21 @@ export default class EventView extends AbstractView {
   #event = null;
   #destinations = null;
   #offers = null;
-  #handlerEditClick = null;
+  #handleEditClick = null;
   #rollupButton = null;
+  #handleFavoriteClick = null;
 
-  constructor({event, destinations, offers, onEditClick}) {
+  constructor({ event, destinations, offers, onEditClick, onFavoriteClick }) {
     super();
     this.#event = event;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handlerEditClick = onEditClick;
+    this.#handleEditClick = onEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
+
     this.#rollupButton = this.element.querySelector('.event__rollup-btn');
-    this.#rollupButton.addEventListener('click', this.#editClickHandler);
+    this.#rollupButton.addEventListener('click', this.#onEditClick);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#onFavoriteClick);
   }
 
   get template() {
@@ -82,12 +86,16 @@ export default class EventView extends AbstractView {
 
   removeElement() {
     super.removeElement();
-    this.#rollupButton.removeEventListener('click', this.#editClickHandler);
+    this.#rollupButton.removeEventListener('click', this.#onEditClick);
   }
 
-  #editClickHandler = (evt) => {
+  #onEditClick = (evt) => {
     evt.preventDefault();
-    this.#handlerEditClick();
+    this.#handleEditClick();
 
+  };
+
+  #onFavoriteClick = () => {
+    this.#handleFavoriteClick();
   };
 }
