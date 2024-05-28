@@ -12,7 +12,7 @@ export default class EventPresenter {
   #eventItemView = null;
   #editEventView = null;
 
-  #tripEventChangeHandler = null;
+  #handleTripEventChange = null;
   #handleEditMode = null;
 
   #mode = Mode.DEFAULT;
@@ -20,13 +20,13 @@ export default class EventPresenter {
   constructor({ container, eventModel, onEventUpdate, onEditMode }) {
     this.#container = container;
     this.#eventModel = eventModel;
-    this.#tripEventChangeHandler = onEventUpdate;
+    this.#handleTripEventChange = onEventUpdate;
     this.#handleEditMode = onEditMode;
   }
 
   init(event) {
     this.#event = event;
-    this.#renderEventItemView(event);
+    this.#renderEventItemView(this.#event);
   }
 
   resetView() {
@@ -73,7 +73,7 @@ export default class EventPresenter {
       onEditClick: onEditClick,
       onFavoriteClick: () => {
         const updatedEvent = updateItem(event, { isFavorite: !event.isFavorite });
-        this.#tripEventChangeHandler(updatedEvent);
+        this.#handleTripEventChange(updatedEvent);
       }
     });
 

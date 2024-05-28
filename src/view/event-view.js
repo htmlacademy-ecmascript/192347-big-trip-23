@@ -63,21 +63,21 @@ export default class EventView extends AbstractView {
   #event = null;
   #destinations = null;
   #offers = null;
-  #handlerEditClick = null;
+  #handleEditClick = null;
   #rollupButton = null;
-  #handlerFavoriteClick = null;
+  #handleFavoriteClick = null;
 
   constructor({ event, destinations, offers, onEditClick, onFavoriteClick }) {
     super();
     this.#event = event;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handlerEditClick = onEditClick;
-    this.#handlerFavoriteClick = onFavoriteClick;
+    this.#handleEditClick = onEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
 
     this.#rollupButton = this.element.querySelector('.event__rollup-btn');
-    this.#rollupButton.addEventListener('click', this.#editClickHandler);
-    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    this.#rollupButton.addEventListener('click', this.#onEditClick);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#onFavoriteClick);
   }
 
   get template() {
@@ -86,16 +86,16 @@ export default class EventView extends AbstractView {
 
   removeElement() {
     super.removeElement();
-    this.#rollupButton.removeEventListener('click', this.#editClickHandler);
+    this.#rollupButton.removeEventListener('click', this.#onEditClick);
   }
 
-  #editClickHandler = (evt) => {
+  #onEditClick = (evt) => {
     evt.preventDefault();
-    this.#handlerEditClick();
+    this.#handleEditClick();
 
   };
 
-  #favoriteClickHandler = () => {
-    this.#handlerFavoriteClick();
+  #onFavoriteClick = () => {
+    this.#handleFavoriteClick();
   };
 }
