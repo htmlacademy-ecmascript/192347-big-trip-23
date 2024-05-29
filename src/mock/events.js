@@ -1,7 +1,7 @@
 export const events = [
   {
     id: 1,
-    basePrice: 1100,
+    basePrice: 1500,
     dateFrom: '2023-03-11T16:45:56.845Z',
     dateTo: '2023-03-11T17:22:13.375Z',
     destination: 1,

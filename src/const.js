@@ -23,9 +23,18 @@ const getDefaultEvent = () => ({
   type: 'flight'
 });
 
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers'
+};
 
-const SORT_TYPES = ['day', 'event', 'time', 'price', 'offers'];
-const DEFAULT_SORT_TYPE = SORT_TYPES[0];
+const DISABLED_SORT_TYPE = [
+  SortType.EVENT,
+  SortType.OFFERS
+];
 
 const FilterTypes = {
   EVERYTHING: 'everything',
@@ -62,11 +71,11 @@ const Mode = {
 export {
   EVENT_TYPES,
   getDefaultEvent,
-  SORT_TYPES,
   FilterTypes,
   EventEmptyListMessages,
   DateFormat,
-  DEFAULT_SORT_TYPE,
   DEFAULT_FILTER_TYPE,
   Mode,
+  SortType,
+  DISABLED_SORT_TYPE
 };
