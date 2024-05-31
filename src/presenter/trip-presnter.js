@@ -1,9 +1,9 @@
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
-import { render } from '../framework/render';
+import { remove, render } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
-import { isEmpty } from '../utils';
-import { DEFAULT_SORT_TYPE, DEFAULT_FILTER_TYPE } from '../const';
+import { isEmpty, sortEvents } from '../utils';
+import { SortType } from '../const';
 import EventPresenter from './event-presenter';
 import { updateData } from '../utils';
 
@@ -13,6 +13,10 @@ export default class TripPresenter {
   #eventListComponent = null;
   #eventPresenters = new Map();
   #events = [];
+  #currentSortType = SortType.DAY;
+  #sortView = null;
+  #renderEmptyView = null;
+
 
   constructor({ container, eventModel }) {
     this.#container = container;
@@ -21,25 +25,49 @@ export default class TripPresenter {
   }
 
   init() {
-    this.#events = this.#eventModel.events;
-    this.#renderEventListView(this.#eventModel);
+    this.#clearEventList();
+    this.#events = sortEvents(this.#eventModel.events, this.#currentSortType);
+    this.#renderEvents(this.#eventModel);
   }
 
-  #renderSortView() {
-    render(new SortView({ sortTypes: this.#eventModel.sortTypes, currentSortType: DEFAULT_SORT_TYPE }), this.#container);
-  }
+  #handleSortTypeChange = (nextSortType) => {
+    this.#currentSortType = nextSortType;
+    this.init();
+  };
 
-  #renderEmptyView() {
-    render(new EmptyListView({ filterTypes: DEFAULT_FILTER_TYPE }), this.#container);
-  }
-
-  #renderEventListView() {
+  #clearEventList() {
     if (isEmpty(this.#events)) {
-      this.#renderEmptyView();
+      remove(this.#renderEmptyView);
+      this.#renderEmptyView = null;
+      return;
+    }
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
+
+    remove(this.#eventListComponent);
+    remove(this.#sortView);
+
+    this.#sortView = null;
+  }
+
+  #handleModeChange = () => {
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #renderEvents() {
+    if (isEmpty(this.#events)) {
+      this.#renderEmptyView = new EmptyListView();
+      render(this.#renderEmptyView, this.#container);
       return;
     }
 
-    this.#renderSortView();
+    this.#sortView = new SortView({
+      sortTypes: this.#eventModel.sortTypes,
+      currentSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange,
+    });
+
+    render(this.#sortView, this.#container);
     render(this.#eventListComponent, this.#container);
 
     this.#events.forEach((event) => {
@@ -48,7 +76,7 @@ export default class TripPresenter {
         eventModel: this.#eventModel,
         container: this.#eventListComponent.element,
         onEventUpdate: this.#handleDataChange,
-        onEditMode: this.#resetAllViews,
+        onModeChange: this.#handleModeChange,
       });
 
       eventPresenter.init(event);
@@ -59,9 +87,5 @@ export default class TripPresenter {
   #handleDataChange = (updatedItem) => {
     this.#events = updateData(this.#events, updatedItem);
     this.#eventPresenters.get(updatedItem.id).init(updatedItem);
-  };
-
-  #resetAllViews = () => {
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 }

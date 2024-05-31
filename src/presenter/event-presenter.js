@@ -1,5 +1,5 @@
 import EventView from '../view/event-view';
-import { render, replace } from '../framework/render';
+import { render, replace, remove } from '../framework/render';
 import EditEventView from '../view/event-edit-view';
 import { updateItem } from '../utils';
 import { Mode } from '../const';
@@ -29,6 +29,16 @@ export default class EventPresenter {
     this.#renderEventItemView(this.#event);
   }
 
+  destroy() {
+    remove(this.#eventItemView);
+    remove(this.#editEventView);
+
+    this.#eventItemView = null;
+    this.#editEventView = null;
+
+    document.removeEventListener('keydown', this.#onEscKeydown);
+  }
+
   resetView() {
     if (this.#mode === Mode.EDIT) {
       this.#switchToViewMode();
@@ -36,7 +46,6 @@ export default class EventPresenter {
   }
 
   #switchToEditMode() {
-    this.#handleEditMode();
     replace(this.#editEventView, this.#eventItemView);
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;

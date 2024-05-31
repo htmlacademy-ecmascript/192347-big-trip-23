@@ -1,13 +1,13 @@
 import { events } from '../mock/events';
 import { destinations } from '../mock/destination';
 import { offers } from '../mock/offers';
-import { SORT_TYPES } from '../const';
+import { SortType } from '../const';
 
 export default class EventModel {
   #events = events;
   #destinations = destinations;
   #offers = offers;
-  #sortTypes = SORT_TYPES;
+  #sortTypes = Object.values(SortType);
 
   get events() {
     return this.#events;
