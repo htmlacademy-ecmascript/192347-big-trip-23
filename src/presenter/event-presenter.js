@@ -46,7 +46,6 @@ export default class EventPresenter {
   }
 
   #switchToEditMode() {
-    this.#handleEditMode();
     replace(this.#editEventView, this.#eventItemView);
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;

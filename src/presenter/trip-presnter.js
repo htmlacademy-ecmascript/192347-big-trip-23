@@ -13,8 +13,7 @@ export default class TripPresenter {
   #eventListComponent = null;
   #eventPresenters = new Map();
   #events = [];
-  #defaultSortType = SortType.DAY;
-  #currentSortType = this.#defaultSortType;
+  #currentSortType = SortType.DAY;
   #sortView = null;
   #renderEmptyView = null;
 

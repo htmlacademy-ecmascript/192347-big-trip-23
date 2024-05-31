@@ -31,7 +31,7 @@ const SortType = {
   OFFERS: 'offers'
 };
 
-const DISABLED_SORT_TYPE = [
+const DISABLED_SORT_TYPES = [
   SortType.EVENT,
   SortType.OFFERS
 ];
@@ -77,5 +77,5 @@ export {
   DEFAULT_FILTER_TYPE,
   Mode,
   SortType,
-  DISABLED_SORT_TYPE
+  DISABLED_SORT_TYPES
 };
