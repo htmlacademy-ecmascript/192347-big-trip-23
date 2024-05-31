@@ -17,11 +17,11 @@ export default class EventPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({ container, eventModel, onEventUpdate, onEditMode }) {
+  constructor({ container, eventModel, onEventUpdate, onModeChange }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#handleTripEventChange = onEventUpdate;
-    this.#handleEditMode = onEditMode;
+    this.#handleEditMode = onModeChange;
   }
 
   init(event) {
@@ -46,6 +46,7 @@ export default class EventPresenter {
   }
 
   #switchToEditMode() {
+    this.#handleEditMode();
     replace(this.#editEventView, this.#eventItemView);
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;
