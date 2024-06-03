@@ -17,11 +17,11 @@ export default class EventPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({ container, eventModel, onEventUpdate, onEditMode }) {
+  constructor({ container, eventModel, onEventUpdate, onModeChange }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#handleTripEventChange = onEventUpdate;
-    this.#handleEditMode = onEditMode;
+    this.#handleEditMode = onModeChange;
   }
 
   init(event) {
@@ -40,18 +40,24 @@ export default class EventPresenter {
   }
 
   resetView() {
-    if (this.#mode === Mode.EDIT) {
-      this.#switchToViewMode();
+    if (this.#mode === Mode.DEFAULT) {
+      return;
     }
+    this.#editEventView.reset(this.#event);
+    this.#switchToViewMode();
   }
 
   #switchToEditMode() {
+    this.#handleEditMode();
     replace(this.#editEventView, this.#eventItemView);
+
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;
+
   }
 
   #switchToViewMode() {
+    this.#editEventView.reset(this.#event);
     replace(this.#eventItemView, this.#editEventView);
     document.removeEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.DEFAULT;
@@ -60,6 +66,7 @@ export default class EventPresenter {
   #onEscKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
+      this.#editEventView.reset(this.#event);
       this.#switchToViewMode();
     }
   };

@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
 
@@ -29,12 +29,10 @@ function editEventTemplate(event, destinations, offers) {
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Event type</legend>
 
-              ${EVENT_TYPES.map((eventType) => (
-      `<div class="event__type-item">
-                <input id="event-type-${eventType}-${eventId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--${eventType}" for="event-type-taxi-1">${capitalizeFirstLetter(eventType)}</label>
+              ${EVENT_TYPES.map((eventType) => (`<div class="event__type-item">
+          <input id="event-type-${eventType}-${eventId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${eventType === type ? 'checked' : ''}>
+                <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-${eventId}">${capitalizeFirstLetter(eventType)}</label>
               </div>`
-
     )).join('')}
 
             </fieldset>
@@ -68,8 +66,8 @@ function editEventTemplate(event, destinations, offers) {
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${event.id ? 'Delete' : 'Cancel'}</button>
-        ${event.id ? (
+        <button class="event__reset-btn" type="reset">${eventId ? 'Delete' : 'Cancel'}</button>
+        ${eventId ? (
       `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>`
@@ -114,8 +112,8 @@ function editEventTemplate(event, destinations, offers) {
   );
 }
 
-export default class EditEventView extends AbstractView {
-  #event = null;
+export default class EditEventView extends AbstractStatefulView {
+  #event = [];
   #destinations = null;
   #offers = null;
   #handleSubmit = null;
@@ -124,19 +122,31 @@ export default class EditEventView extends AbstractView {
 
   constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
     super();
-    this.#event = event;
+    this._setState(EditEventView.parseEventToState(event));
+
     this.#destinations = destinations;
     this.#offers = offers;
     this.#handleSubmit = onFormSubmit;
     this.#handleCancel = onFormCancel;
-
-    this.element.addEventListener('submit', this.#onSubmit);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
+    this._restoreHandlers();
   }
 
   get template() {
-    return editEventTemplate(this.#event, this.#destinations, this.#offers);
+    return editEventTemplate(this._state, this.#destinations, this.#offers);
+  }
+
+  reset(event) {
+    this.updateElement(
+      EditEventView.parseEventToState(event)
+    );
+  }
+
+  _restoreHandlers() {
+    this.element.addEventListener('submit', this.#onSubmit);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancel);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
+    this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
   }
 
   removeElement() {
@@ -145,6 +155,21 @@ export default class EditEventView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
     this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
   }
+
+  #onEventType = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      type: evt.target.value
+    });
+  };
+
+  #onDestinationChange = (evt) => {
+    evt.preventDefault();
+    const destination = this.#destinations.find((element) => element.name === evt.target.value);
+    this.updateElement({
+      destination: destination.id
+    });
+  };
 
   #onSubmit = (evt) => {
     evt.preventDefault();
@@ -155,4 +180,12 @@ export default class EditEventView extends AbstractView {
     evt.preventDefault();
     this.#handleCancel();
   };
+
+  static parseEventToState(event) {
+    return { ...event };
+  }
+
+  static parseStateToEvent(state) {
+    return { ...state };
+  }
 }
