@@ -40,10 +40,11 @@ export default class EventPresenter {
   }
 
   resetView() {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#editEventView.reset(this.#event);
-      this.#switchToViewMode();
+    if (this.#mode === Mode.DEFAULT) {
+      return;
     }
+    this.#editEventView.reset(this.#event);
+    this.#switchToViewMode();
   }
 
   #switchToEditMode() {
