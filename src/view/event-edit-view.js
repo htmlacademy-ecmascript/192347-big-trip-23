@@ -113,7 +113,6 @@ function editEventTemplate(event, destinations, offers) {
 }
 
 export default class EditEventView extends AbstractStatefulView {
-  #event = [];
   #destinations = null;
   #offers = null;
   #handleSubmit = null;
@@ -141,19 +140,19 @@ export default class EditEventView extends AbstractStatefulView {
     );
   }
 
+  removeElement() {
+    super.removeElement();
+    this.element.removeEventListener('submit', this.#onSubmit);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
+  }
+
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onSubmit);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancel);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
-  }
-
-  removeElement() {
-    super.removeElement();
-    this.element.removeEventListener('submit', this.#onSubmit);
-    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
   }
 
   #onEventType = (evt) => {
