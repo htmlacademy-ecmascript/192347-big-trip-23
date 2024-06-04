@@ -2,6 +2,10 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
 
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/material_blue.css';
+
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type } = event;
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
@@ -118,6 +122,8 @@ export default class EditEventView extends AbstractStatefulView {
   #handleSubmit = null;
   #handleCancel = null;
 
+  #datepickerStart = null;
+  #datepickerEnd = null;
 
   constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
     super();
@@ -128,6 +134,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.#handleSubmit = onFormSubmit;
     this.#handleCancel = onFormCancel;
     this._restoreHandlers();
+    this.#setDatepickers();
   }
 
   get template() {
@@ -145,6 +152,13 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.removeEventListener('submit', this.#onSubmit);
     this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
     this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
+
+    if (this.#setDatepickers) {
+      this.#datepickerStart.destroy();
+      this.#datepickerEnd.destroy();
+      this.#datepickerStart = null;
+      this.#datepickerEnd = null;
+    }
   }
 
   _restoreHandlers() {
@@ -153,6 +167,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
+    this.#setDatepickers();
   }
 
   #onEventType = (evt) => {
@@ -179,6 +194,43 @@ export default class EditEventView extends AbstractStatefulView {
     evt.preventDefault();
     this.#handleCancel();
   };
+
+  #setDatepickers() {
+    this.#datepickerStart = flatpickr(this.element.querySelector('[name="event-start-time"]'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateFrom,
+        maxDate: this._state.dateTo,
+        onChange: this.#onDateStartChange,
+      },
+    );
+
+    this.#datepickerEnd = flatpickr(this.element.querySelector('[name="event-end-time"]'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#onDateEndChange,
+      },
+    );
+  }
+
+  #onDateStartChange = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #onDateEndChange = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
 
   static parseEventToState(event) {
     return { ...event };
