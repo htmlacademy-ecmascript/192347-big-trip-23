@@ -12,6 +12,12 @@ const EVENT_TYPES = [
   'restaurant'
 ];
 
+const DatepickerConfig = {
+  dateFormat: 'd/m/y H:i',
+  enableTime: true,
+  'time_24hr': true,
+}
+
 const getDefaultEvent = () => ({
   id: '',
   basePrice: 0,
@@ -77,5 +83,6 @@ export {
   DEFAULT_FILTER_TYPE,
   Mode,
   SortType,
-  DISABLED_SORT_TYPES
+  DISABLED_SORT_TYPES,
+  datepickerConfig
 };

@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { EVENT_TYPES } from '../const.js';
+import { EVENT_TYPES, DatepickerConfig } from '../const.js';
 import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
 
 import flatpickr from 'flatpickr';
@@ -153,10 +153,13 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
     this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
 
-    if (this.#setDatepickers) {
+    if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
-      this.#datepickerEnd.destroy();
       this.#datepickerStart = null;
+    }
+    
+    if (this.#datepickerEnd) {
+      this.#datepickerEnd.destroy();
       this.#datepickerEnd = null;
     }
   }
@@ -198,9 +201,7 @@ export default class EditEventView extends AbstractStatefulView {
   #setDatepickers() {
     this.#datepickerStart = flatpickr(this.element.querySelector('[name="event-start-time"]'),
       {
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
+        ...DatepickerConfig,
         defaultDate: this._state.dateFrom,
         maxDate: this._state.dateTo,
         onChange: this.#onDateStartChange,
@@ -209,9 +210,7 @@ export default class EditEventView extends AbstractStatefulView {
 
     this.#datepickerEnd = flatpickr(this.element.querySelector('[name="event-end-time"]'),
       {
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
+        ...DatepickerConfig,
         defaultDate: this._state.dateTo,
         minDate: this._state.dateFrom,
         onChange: this.#onDateEndChange,
