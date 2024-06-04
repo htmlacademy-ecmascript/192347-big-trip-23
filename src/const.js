@@ -16,7 +16,7 @@ const DatepickerConfig = {
   dateFormat: 'd/m/y H:i',
   enableTime: true,
   'time_24hr': true,
-}
+};
 
 const getDefaultEvent = () => ({
   id: '',
@@ -84,5 +84,5 @@ export {
   Mode,
   SortType,
   DISABLED_SORT_TYPES,
-  datepickerConfig
+  DatepickerConfig
 };

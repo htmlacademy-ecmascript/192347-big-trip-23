@@ -157,7 +157,7 @@ export default class EditEventView extends AbstractStatefulView {
       this.#datepickerStart.destroy();
       this.#datepickerStart = null;
     }
-    
+
     if (this.#datepickerEnd) {
       this.#datepickerEnd.destroy();
       this.#datepickerEnd = null;
