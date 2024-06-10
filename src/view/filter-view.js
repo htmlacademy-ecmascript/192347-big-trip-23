@@ -8,33 +8,43 @@ function createFilterItemTemplate(value, isChecked) {
   return (
     `
     <div class="trip-filters__filter">
-    <input id="filter-${value}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${value}" ${getCheckedClass(isChecked)}>
-    <label class="trip-filters__filter-label" for="filter-${value}">${value}</label>
+      <input id="filter-${value}" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="${value}" ${getCheckedClass(isChecked)}>
+      <label class="trip-filters__filter-label" for="filter-${value}">${value}</label>
     </div>
     `
   );
 }
 
-function createFilterTemplate(currentFilter) {
+function createFilterTemplate(currentFilterType) {
   return (
     `
     <form class="trip-filters" action="#" method="get">
-    ${filterTypes.map((filterType) => createFilterItemTemplate(filterType, filterType === currentFilter)).join('')}
-    <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>
-  `
+      ${filterTypes.map((filterType) => createFilterItemTemplate(filterType, filterType === currentFilterType)).join('')}
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>
+    `
   );
 }
 
 export default class FilterView extends AbstractView {
-  #currentFilter = '';
+  #currentFilter = null;
+  #handleFilterTypeChange = null;
 
-  constructor({ currentFilter }) {
+  constructor({ currentFilterType, onFilterTypeChange }) {
     super();
-    this.#currentFilter = currentFilter;
+    this.#currentFilter = currentFilterType;
+    this.#handleFilterTypeChange = onFilterTypeChange;
+
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
   get template() {
-    return createFilterTemplate(filterTypes, this.#currentFilter);
+    return createFilterTemplate(this.#currentFilter);
   }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFilterTypeChange(evt.target.value);
+    console.log(evt.target.value);
+  };
 }

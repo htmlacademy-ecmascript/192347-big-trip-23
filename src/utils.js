@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DateFormat, SortType } from './const';
+import { DateFormat, SortType, FilterTypes } from './const';
 dayjs.extend(duration);
 
 function formatDate(date, dateFormat) {
@@ -52,4 +52,17 @@ const isEmpty = (list) => list.length === 0;
 const updateData = (data, update) => data.map((item) => item.id === update.id ? update : item);
 const updateItem = (item, prop) => ({ ...item, ...prop });
 
-export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents };
+const now = dayjs();
+
+const filter = {
+  [FilterTypes.EVERYTHING]: (events) => events,
+  [FilterTypes.FUTURE]: (events) => events.filter(({ dateFrom }) => dayjs(dateFrom).isAfter(now)),
+  [FilterTypes.PRESENT]: (events) => events.filter(({ dateFrom, dateTo }) => {
+    const start = dayjs(dateFrom);
+    const end = dayjs(dateTo);
+    return start.isBefore(now) && end.isAfter(now);
+  }),
+  [FilterTypes.PAST]: (events) => events.filter(({ dateTo }) => dayjs(dateTo).isBefore(now)),
+};
+
+export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents, sortEventsBy, filter };

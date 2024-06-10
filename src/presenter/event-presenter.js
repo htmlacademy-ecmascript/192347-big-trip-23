@@ -1,13 +1,13 @@
 import EventView from '../view/event-view';
 import { render, replace, remove } from '../framework/render';
 import EditEventView from '../view/event-edit-view';
-import { updateItem } from '../utils';
-import { Mode } from '../const';
+import { Mode, UpdateType, UserAction } from '../const';
 
 export default class EventPresenter {
   #container = null;
   #eventModel = null;
   #event = null;
+  #updatedOffers = [];
 
   #eventItemView = null;
   #editEventView = null;
@@ -27,6 +27,7 @@ export default class EventPresenter {
   init(event) {
     this.#event = event;
     this.#renderEventItemView(this.#event);
+
   }
 
   destroy() {
@@ -71,6 +72,17 @@ export default class EventPresenter {
     }
   };
 
+
+
+
+  #handleSubmit = (event) => {
+    this.#handleTripEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      event
+    );
+  };
+
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;
@@ -79,17 +91,20 @@ export default class EventPresenter {
 
 
     const onEditClick = () => this.#switchToEditMode();
-    const onFormSubmit = () => this.#switchToViewMode();
     const onFormCancel = () => this.#switchToViewMode();
 
     this.#eventItemView = new EventView({
       event,
       offers,
       destinations,
+      updatedOffers: this.#event.offers,
       onEditClick: onEditClick,
       onFavoriteClick: () => {
-        const updatedEvent = updateItem(event, { isFavorite: !event.isFavorite });
-        this.#handleTripEventChange(updatedEvent);
+        this.#handleTripEventChange(
+          UserAction.UPDATE_EVENT,
+          UpdateType.MINOR,
+          {...this.#event, isFavorite: !event.isFavorite},
+        );
       }
     });
 
@@ -97,8 +112,15 @@ export default class EventPresenter {
       event,
       offers,
       destinations,
-      onFormSubmit: onFormSubmit,
       onFormCancel: onFormCancel,
+      onFormSubmit: this.#handleSubmit,
+      onFormDelete: (event) => {
+        this.#handleTripEventChange(
+          UserAction.DELETE_EVENT,
+          UpdateType.MINOR,
+          event,
+        );
+      },
     });
 
     if (prevEventView === null) {

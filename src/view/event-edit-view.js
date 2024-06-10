@@ -6,16 +6,24 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/material_blue.css';
 
+
+
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type } = event;
+
+  //вынести в util
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
-  const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
+  const selectedOffers =  event.offers.map(Number) || [];
+  const filteredOffers = typeOffers.filter(offer => selectedOffers.includes(offer.id));
+  
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const eventId = event.id;
   const { name, description, pictures } = currentDestination || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
+
+
 
   return (
     `
@@ -86,7 +94,7 @@ function editEventTemplate(event, destinations, offers) {
       <div class="event__available-offers">
       ${typeOffers.map((typeOffer) => (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" ${eventOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${typeOffer.title}-${eventId}">
           <span class="event__offer-title">${typeOffer.title}</span>
           +€&nbsp;
@@ -121,11 +129,12 @@ export default class EditEventView extends AbstractStatefulView {
   #offers = null;
   #handleSubmit = null;
   #handleCancel = null;
+  #handleDelete = null;
 
   #datepickerStart = null;
   #datepickerEnd = null;
 
-  constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
+  constructor({ event, destinations, offers, onFormCancel, onFormSubmit, onFormDelete }) {
     super();
     this._setState(EditEventView.parseEventToState(event));
 
@@ -133,6 +142,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.#offers = offers;
     this.#handleSubmit = onFormSubmit;
     this.#handleCancel = onFormCancel;
+    this.#handleDelete = onFormDelete;
     this._restoreHandlers();
     this.#setDatepickers();
   }
@@ -151,7 +161,7 @@ export default class EditEventView extends AbstractStatefulView {
     super.removeElement();
     this.element.removeEventListener('submit', this.#onSubmit);
     this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onDelete);
 
     if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
@@ -167,9 +177,11 @@ export default class EditEventView extends AbstractStatefulView {
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onSubmit);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onDelete);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#onOfferChange);
     this.#setDatepickers();
   }
 
@@ -178,7 +190,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.updateElement({
       type: evt.target.value
     });
-  };
+  }; 
 
   #onDestinationChange = (evt) => {
     evt.preventDefault();
@@ -188,15 +200,36 @@ export default class EditEventView extends AbstractStatefulView {
     });
   };
 
+  #onPriceChange = (evt) => {
+    this._setState({
+      basePrice: evt.target.value
+    });
+  };
+
+  #onOfferChange = (evt) => {
+    evt.preventDefault();
+    const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
+    const realOffers = selectedOffers.map((item) => item.dataset.offerId);
+
+    this._setState({
+      offers: realOffers
+    });
+  };
+
   #onSubmit = (evt) => {
     evt.preventDefault();
-    this.#handleSubmit();
+    this.#handleSubmit(EditEventView.parseStateToEvent(this._state));
   };
 
   #onCancel = (evt) => {
     evt.preventDefault();
     this.#handleCancel();
   };
+
+  #onDelete = (evt) => {
+    evt.preventDefault();
+    this.#handleDelete(EditEventView.parseStateToEvent(this._state));
+  }
 
   #setDatepickers() {
     this.#datepickerStart = flatpickr(this.element.querySelector('[name="event-start-time"]'),
