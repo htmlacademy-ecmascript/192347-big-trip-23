@@ -17,7 +17,6 @@ export default class EmptyListView extends AbstractView {
   constructor({ filterType }) {
     super();
     this.#filterTypes = filterType;
-    console.log(filterType);
   }
 
   get template() {

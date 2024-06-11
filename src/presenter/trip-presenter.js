@@ -2,9 +2,10 @@ import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import { remove, render } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
-import { isEmpty, sortEvents, filter } from '../utils';
-import { DEFAULT_FILTER_TYPE, SortType, UpdateType, UserAction } from '../const';
+import { isEmpty, sortEvents, filter, sortEventsBy } from '../utils';
+import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
+import NewEventPresenter from './new-event-presenter';
 
 
 export default class TripPresenter {
@@ -13,17 +14,26 @@ export default class TripPresenter {
   #filterModel = null;
   #eventListComponent = null;
   #eventPresenters = new Map();
+  #newEventPresenter = null;
   #currentSortType = SortType.DAY;
   #sortView = null;
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
 
 
-  constructor({ container, eventModel, filterModel}) {
+  constructor({ container, eventModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventModel: this.#eventModel,
+      container: this.#eventListComponent.element,
+      onModeChange: this.#handleModeChange,
+      onEventUpdate: this.#handleViewAction,
+      // onEventDestroy: onNewEventDestroy
+    });
     
     this.#eventModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -40,6 +50,13 @@ export default class TripPresenter {
   init() {
     this.#clearEventList();
     this.#eventsRendering();
+  }
+
+  createEvent() {
+    this.#currentSortType = SortType.DAY;
+    console.log(this.events);
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterTypes.EVERYTHING);
+    this.#newEventPresenter.init();
   }
 
   #handleSortTypeChange = (nextSortType) => {

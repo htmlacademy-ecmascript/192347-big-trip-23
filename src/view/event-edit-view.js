@@ -177,7 +177,7 @@ export default class EditEventView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onEventSubmit);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onEventCancel);
+    this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onEventCancel);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onEventDelete);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);

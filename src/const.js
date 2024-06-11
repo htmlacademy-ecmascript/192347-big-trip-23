@@ -21,8 +21,8 @@ const DatepickerConfig = {
 const getDefaultEvent = () => ({
   id: '',
   basePrice: 0,
-  dateFrom: dayjs(),
-  dateTo: dayjs(),
+  dateFrom: '2024-06-11T12:22:13.375Z',
+  dateTo: '2024-06-11T12:22:13.375Z',
   destination: 0,
   isFavorite: false,
   offers: [],

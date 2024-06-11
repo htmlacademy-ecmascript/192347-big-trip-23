@@ -54,6 +54,8 @@ const updateItem = (item, prop) => ({ ...item, ...prop });
 
 const now = dayjs();
 
+console.log(now);
+
 const filter = {
   [FilterTypes.EVERYTHING]: (events) => [...events],
   [FilterTypes.FUTURE]: (events) => [...events].filter(({ dateFrom }) => dayjs(dateFrom).isAfter(now)),
