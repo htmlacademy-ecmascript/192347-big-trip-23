@@ -19,6 +19,7 @@ export default class TripPresenter {
   #sortView = null;
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
+  #handleNewPointDestroy = null;
 
 
   constructor({ container, eventModel, filterModel, onNewEventDestroy}) {
@@ -26,13 +27,14 @@ export default class TripPresenter {
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
+    this.#handleNewPointDestroy = onNewEventDestroy;
+
 
     this.#newEventPresenter = new NewEventPresenter({
       eventModel: this.#eventModel,
       container: this.#eventListComponent.element,
-      onModeChange: this.#handleModeChange,
-      onEventUpdate: this.#handleViewAction,
-      // onEventDestroy: onNewEventDestroy
+      onDataChange: this.#handleViewAction,
+      onEventDestroy: this.#handleNewPointDestroy,
     });
     
     this.#eventModel.addObserver(this.#handleModelEvent);
@@ -71,7 +73,7 @@ export default class TripPresenter {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
-    remove(this.#eventListComponent);
+    // remove(this.#eventListComponent);
     remove(this.#sortView);
 
     this.#sortView = null;
@@ -103,7 +105,7 @@ export default class TripPresenter {
         event,
         eventModel: this.#eventModel,
         container: this.#eventListComponent.element,
-        onEventUpdate: this.#handleViewAction,
+        onDataChange: this.#handleViewAction,
         onModeChange: this.#handleModeChange,
       });
 

@@ -130,7 +130,7 @@ export default class EditEventView extends AbstractStatefulView {
   #offers = null;
   #handleFormSubmit = null;
   #handleFormCancel = null;
-  #handleFormDelete = null;
+  #handleEventDeleteClick = null;
 
   #datepickerStart = null;
   #datepickerEnd = null;
@@ -143,7 +143,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.#offers = offers;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleFormCancel = onFormCancel;
-    this.#handleFormDelete = onFormDelete;
+    this.#handleEventDeleteClick = onFormDelete;
     this._restoreHandlers();
     this.#setDatepickers();
   }
@@ -161,8 +161,8 @@ export default class EditEventView extends AbstractStatefulView {
   removeElement() {
     super.removeElement();
     this.element.removeEventListener('submit', this.#onEventSubmit);
-    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onEventCancel);
-    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onEventDelete);
+    this.element.querySelector('.event__rollup-btn')?.removeEventListener('click', this.#onEventCancel);
+    this.element.querySelector('.event__reset-btn')?.removeEventListener('click', this.#onFormDelete);
 
     if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
@@ -178,13 +178,13 @@ export default class EditEventView extends AbstractStatefulView {
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onEventSubmit);
     this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onEventCancel);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onEventDelete);
+    this.element.querySelector('.event__reset-btn')?.addEventListener('click', this.#onFormDelete);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#onOfferChange);
     this.#setDatepickers();
-  }
+}
 
   #onEventType = (evt) => {
     evt.preventDefault();
@@ -227,9 +227,9 @@ export default class EditEventView extends AbstractStatefulView {
     this.#handleFormCancel();
   };
 
-  #onEventDelete = (evt) => {
+  #onFormDelete = (evt) => {
     evt.preventDefault();
-    this.#handleFormDelete(EditEventView.parseStateToEvent(this._state));
+    this.#handleEventDeleteClick(EditEventView.parseStateToEvent(this._state));
   }
 
   #setDatepickers() {

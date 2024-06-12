@@ -1,12 +1,12 @@
-import {remove, render, RenderPosition} from '../framework/render.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import EditEventView from '../view/event-edit-view.js';
-import {nanoid} from 'nanoid';
-import {UserAction, UpdateType, EVENT_TYPES, getDefaultEvent} from '../const.js';
+import { nanoid } from 'nanoid';
+import { UserAction, UpdateType, EVENT_TYPES, getDefaultEvent } from '../const.js';
 
 export default class NewEventPresenter {
 
   #container = null;
-  #handleDataChange = null;
+  #handleTripEventChange = null;
   #handleDestroy = null;
   #eventModel = null;
 
@@ -18,16 +18,14 @@ export default class NewEventPresenter {
 
   #eventEditComponent = null;
 
-  constructor({container, onDataChange, onDestroy, eventModel}) {
+  constructor({ container, onDataChange, onEventDestroy, eventModel }) {
+    this.#event = getDefaultEvent();
     this.#eventModel = eventModel;
-    this.#container = container;
-    this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
     this.#destinations = this.#eventModel.destinations;
     this.#offers = this.#eventModel.offers;
-    this.#event = getDefaultEvent();
-    console.log(this.#event);
-    console.log(this.#container);
+    this.#container = container;
+    this.#handleTripEventChange = onDataChange;
+    this.#handleDestroy = onEventDestroy;
   }
 
   init() {
@@ -41,8 +39,7 @@ export default class NewEventPresenter {
       eventTypes: this.#eventTypes,
       destinations: this.#destinations,
       onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick,
-      onFormCancel: this.#handleDeleteClick,
+      onFormDelete: this.#handleEventDeleteClick,
     });
 
     console.log(this.#eventEditComponent);
@@ -53,6 +50,9 @@ export default class NewEventPresenter {
   }
 
   destroy() {
+    console.log('Destroy called');
+    console.log('this.#eventEditComponent:', this.#eventEditComponent);
+
     if (this.#eventEditComponent === null) {
       return;
     }
@@ -66,14 +66,15 @@ export default class NewEventPresenter {
   }
 
   #handleFormSubmit = (event) => {
-    this.#handleDataChange(
+    this.#handleTripEventChange(
       UserAction.ADD_EVENT,
-      {id: nanoid(), ...event},
+      UpdateType.MINOR,
+      { id: nanoid(), ...event },
     );
     this.destroy();
   };
 
-  #handleDeleteClick = () => {
+  #handleEventDeleteClick = () => {
     this.destroy();
   };
 
