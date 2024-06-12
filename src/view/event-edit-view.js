@@ -1,30 +1,24 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES, DatepickerConfig } from '../const.js';
-import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
-
+import { capitalizeFirstLetter, formatDate, DateFormat, getFilteredSelectedOffers } from '../utils.js';
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/material_blue.css';
-
-
 
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type } = event;
 
 
-  //вынести в util
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
-  const selectedOffers =  event.offers.map(Number) || [];
-  const filteredOffers = typeOffers.filter(offer => selectedOffers.includes(offer.id));
-  
+  const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
+
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const eventId = event.id;
   const { name, description, pictures } = currentDestination || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
-
-
 
   return (
     `
@@ -56,8 +50,9 @@ function editEventTemplate(event, destinations, offers) {
           <label class="event__label  event__type-output" for="event-destination-${eventId}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${eventId}" type="text" name="event-destination" value="${name || ''}" list="destination-list-${eventId}">
-          <datalist id="destination-list-${eventId}">
+          <input class="event__input  event__input--destination" id="event-destination-${eventId}" 
+          type="text" name="event-destination" value="${he.encode(name || '')}" list="destination-list-${eventId}" required>
+          <datalist id="destination-list-${eventId}" required>
           ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
           </datalist>
         </div>
@@ -75,7 +70,7 @@ function editEventTemplate(event, destinations, offers) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice}" min="1" max="100000">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -95,7 +90,7 @@ function editEventTemplate(event, destinations, offers) {
       <div class="event__available-offers">
       ${typeOffers.map((typeOffer) => (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredSelectedOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${typeOffer.title}-${eventId}">
           <span class="event__offer-title">${typeOffer.title}</span>
           +€&nbsp;
@@ -184,21 +179,27 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#onOfferChange);
     this.#setDatepickers();
-}
+  }
 
   #onEventType = (evt) => {
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value
     });
-  }; 
+  };
 
   #onDestinationChange = (evt) => {
     evt.preventDefault();
     const destination = this.#destinations.find((element) => element.name === evt.target.value);
-    this.updateElement({
-      destination: destination.id
-    });
+    if (destination) {
+      this.updateElement({
+        destination: destination.id
+      });
+    } else {
+      this.updateElement({
+        destination: null
+      });
+    }
   };
 
   #onPriceChange = (evt) => {
@@ -230,7 +231,7 @@ export default class EditEventView extends AbstractStatefulView {
   #onFormDelete = (evt) => {
     evt.preventDefault();
     this.#handleEventDeleteClick(EditEventView.parseStateToEvent(this._state));
-  }
+  };
 
   #setDatepickers() {
     this.#datepickerStart = flatpickr(this.element.querySelector('[name="event-start-time"]'),
@@ -263,7 +264,6 @@ export default class EditEventView extends AbstractStatefulView {
       dateTo: userDate,
     });
   };
-
 
   static parseEventToState(event) {
     return { ...event };

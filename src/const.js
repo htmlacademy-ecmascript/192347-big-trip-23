@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-
 const EVENT_TYPES = [
   'taxi',
   'bus',
@@ -21,8 +19,8 @@ const DatepickerConfig = {
 const getDefaultEvent = () => ({
   id: '',
   basePrice: 0,
-  dateFrom: '2024-06-11T12:22:13.375Z',
-  dateTo: '2024-06-11T16:22:13.375Z',
+  dateFrom: '2024-06-02T20:08:08.363Z',
+  dateTo: '2024-06-03T07:18:08.363Z',
   destination: 0,
   isFavorite: false,
   offers: [],

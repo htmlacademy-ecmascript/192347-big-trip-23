@@ -42,17 +42,12 @@ export default class NewEventPresenter {
       onFormDelete: this.#handleEventDeleteClick,
     });
 
-    console.log(this.#eventEditComponent);
-
     render(this.#eventEditComponent, this.#container, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
   destroy() {
-    console.log('Destroy called');
-    console.log('this.#eventEditComponent:', this.#eventEditComponent);
-
     if (this.#eventEditComponent === null) {
       return;
     }
@@ -69,7 +64,7 @@ export default class NewEventPresenter {
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      { id: nanoid(), ...event },
+      { ...event, id: nanoid() },
     );
     this.destroy();
   };

@@ -2,7 +2,7 @@ import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import { remove, render } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
-import { isEmpty, sortEvents, filter, sortEventsBy } from '../utils';
+import { isEmpty, sortEvents, filter } from '../utils';
 import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
@@ -20,9 +20,10 @@ export default class TripPresenter {
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
   #handleNewPointDestroy = null;
+  #activePresenter = null;
 
 
-  constructor({ container, eventModel, filterModel, onNewEventDestroy}) {
+  constructor({ container, eventModel, filterModel, onNewEventDestroy }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
@@ -36,11 +37,11 @@ export default class TripPresenter {
       onDataChange: this.#handleViewAction,
       onEventDestroy: this.#handleNewPointDestroy,
     });
-    
+
     this.#eventModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
-  
+
   get events() {
     this.#filterType = this.#filterModel.filter;
     const events = this.#eventModel.events;
@@ -56,9 +57,14 @@ export default class TripPresenter {
 
   createEvent() {
     this.#currentSortType = SortType.DAY;
-    console.log(this.events);
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterTypes.EVERYTHING);
+
+    if (this.#activePresenter) {
+      this.#activePresenter.destroy();
+    }
+
     this.#newEventPresenter.init();
+    this.#activePresenter = this.#newEventPresenter;
   }
 
   #handleSortTypeChange = (nextSortType) => {
@@ -66,14 +72,13 @@ export default class TripPresenter {
     this.init();
   };
 
-#clearEventList() {
+  #clearEventList() {
     remove(this.#emptyListView);
     this.#emptyListView = null;
 
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
-    // remove(this.#eventListComponent);
     remove(this.#sortView);
 
     this.#sortView = null;
@@ -81,11 +86,19 @@ export default class TripPresenter {
 
   #handleModeChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
+
+    if (this.#activePresenter && this.#activePresenter !== this.#newEventPresenter) {
+      this.#activePresenter.resetView();
+      this.#activePresenter = null;
+    } else if (this.#activePresenter === this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+      this.#activePresenter = null;
+    }
   };
 
   #eventsRendering() {
     if (isEmpty(this.events)) {
-      console.log('this.events', this.events);
+
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
       return;
@@ -115,7 +128,7 @@ export default class TripPresenter {
   }
 
   #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
+
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventModel.updateEvent(updateType, update);

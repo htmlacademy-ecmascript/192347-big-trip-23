@@ -17,6 +17,7 @@ export default class EventPresenter {
 
   #mode = Mode.DEFAULT;
 
+
   constructor({ container, eventModel, onDataChange, onModeChange }) {
     this.#container = container;
     this.#eventModel = eventModel;
@@ -27,7 +28,6 @@ export default class EventPresenter {
   init(event) {
     this.#event = event;
     this.#renderEventItemView(this.#event);
-
   }
 
   destroy() {
@@ -47,8 +47,6 @@ export default class EventPresenter {
     this.#editEventView.reset(this.#event);
     this.#switchToViewMode();
   }
-
-  
 
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
@@ -91,7 +89,6 @@ export default class EventPresenter {
 
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;
-
   }
 
   #switchToViewMode() {
@@ -130,7 +127,7 @@ export default class EventPresenter {
     this.#handleTripEventChange(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
-      {...this.#event, isFavorite: !this.#event.isFavorite},
+      { ...this.#event, isFavorite: !this.#event.isFavorite },
     );
   };
 

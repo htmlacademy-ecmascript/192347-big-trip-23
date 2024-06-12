@@ -1,13 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { DateFormat, formatDate, countDuration } from '../utils.js';
+import { DateFormat, formatDate, countDuration, getFilteredSelectedOffers } from '../utils.js';
 
 function createEventTemplate(event, offers, destinations, updatedOffers) {
   const { basePrice, dateFrom, dateTo, type, isFavorite } = event;
 
-    //вынести в util
-  const typeOffers = offers.find((offer) => offer.type === event.type).offers
-  const selectedOffers =  updatedOffers.map(Number) || [];
-  const filteredOffers = typeOffers.filter(offer => selectedOffers.includes(offer.id));
+  const typeOffers = offers.find((offer) => offer.type === event.type).offers;
+  const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers, updatedOffers);
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const dateAttribute = formatDate(dateFrom, DateFormat.ATTRIBUTE_DATE);
@@ -40,7 +38,7 @@ function createEventTemplate(event, offers, destinations, updatedOffers) {
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                ${filteredOffers.map((offer) => (
+                ${filteredSelectedOffers.map((offer) => (
       `<li class="event__offer">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
