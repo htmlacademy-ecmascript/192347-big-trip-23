@@ -17,7 +17,7 @@ export default class EventModel extends Observable {
     this.#eventApiService = eventApiService;
 
     this.#eventApiService.events.then((events) => {
-      console.log(events);
+      console.log(events.map(this.#adaptToClient));
     });
 
     this.#eventApiService.destinations.then((destinations) => {
@@ -83,5 +83,21 @@ export default class EventModel extends Observable {
     ];
 
     this._notify(updateType);
+  }
+
+  #adaptToClient(event) {
+    const adaptedEvent = {...event,
+      basePrice: event['base_price'],
+      dateFrom:event['date_from'] !== null ? new Date(event['date_from']) : event['date_from'],
+      dateTo: event['date_to'] !== null ? new Date(event['date_to']) : event['date_to'],
+      isFavorite: event['is_favorite'],
+    };
+
+    delete adaptedEvent['base_price'];
+    delete adaptedEvent['date_from'];
+    delete adaptedEvent['date_to'];
+    delete adaptedEvent['is_favorite'];
+
+    return adaptedEvent;
   }
 }
