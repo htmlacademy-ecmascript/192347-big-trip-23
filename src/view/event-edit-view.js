@@ -1,15 +1,18 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES, DatepickerConfig } from '../const.js';
-import { capitalizeFirstLetter, formatDate, DateFormat } from '../utils.js';
-
+import { capitalizeFirstLetter, formatDate, DateFormat, getFilteredSelectedOffers } from '../utils.js';
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/material_blue.css';
 
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type } = event;
+
+
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
-  const eventOffers = typeOffers.filter((typeOffer) => event.offers.includes(typeOffer.id));
+  const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
+
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const eventId = event.id;
   const { name, description, pictures } = currentDestination || {};
@@ -47,8 +50,9 @@ function editEventTemplate(event, destinations, offers) {
           <label class="event__label  event__type-output" for="event-destination-${eventId}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${eventId}" type="text" name="event-destination" value="${name || ''}" list="destination-list-${eventId}">
-          <datalist id="destination-list-${eventId}">
+          <input class="event__input  event__input--destination" id="event-destination-${eventId}" 
+          type="text" name="event-destination" value="${he.encode(name || '')}" list="destination-list-${eventId}" required>
+          <datalist id="destination-list-${eventId}" required>
           ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
           </datalist>
         </div>
@@ -66,7 +70,7 @@ function editEventTemplate(event, destinations, offers) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice}" min="1" max="100000">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -86,7 +90,7 @@ function editEventTemplate(event, destinations, offers) {
       <div class="event__available-offers">
       ${typeOffers.map((typeOffer) => (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" ${eventOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredSelectedOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${typeOffer.title}-${eventId}">
           <span class="event__offer-title">${typeOffer.title}</span>
           +€&nbsp;
@@ -119,20 +123,22 @@ function editEventTemplate(event, destinations, offers) {
 export default class EditEventView extends AbstractStatefulView {
   #destinations = null;
   #offers = null;
-  #handleSubmit = null;
-  #handleCancel = null;
+  #handleFormSubmit = null;
+  #handleFormCancel = null;
+  #handleEventDeleteClick = null;
 
   #datepickerStart = null;
   #datepickerEnd = null;
 
-  constructor({ event, destinations, offers, onFormCancel, onFormSubmit }) {
+  constructor({ event, destinations, offers, onFormCancel, onFormSubmit, onFormDelete }) {
     super();
     this._setState(EditEventView.parseEventToState(event));
 
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleSubmit = onFormSubmit;
-    this.#handleCancel = onFormCancel;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleFormCancel = onFormCancel;
+    this.#handleEventDeleteClick = onFormDelete;
     this._restoreHandlers();
     this.#setDatepickers();
   }
@@ -149,9 +155,9 @@ export default class EditEventView extends AbstractStatefulView {
 
   removeElement() {
     super.removeElement();
-    this.element.removeEventListener('submit', this.#onSubmit);
-    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancel);
+    this.element.removeEventListener('submit', this.#onEventSubmit);
+    this.element.querySelector('.event__rollup-btn')?.removeEventListener('click', this.#onEventCancel);
+    this.element.querySelector('.event__reset-btn')?.removeEventListener('click', this.#onFormDelete);
 
     if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
@@ -165,11 +171,13 @@ export default class EditEventView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    this.element.addEventListener('submit', this.#onSubmit);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancel);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancel);
+    this.element.addEventListener('submit', this.#onEventSubmit);
+    this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onEventCancel);
+    this.element.querySelector('.event__reset-btn')?.addEventListener('click', this.#onFormDelete);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#onEventType);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#onOfferChange);
     this.#setDatepickers();
   }
 
@@ -183,19 +191,46 @@ export default class EditEventView extends AbstractStatefulView {
   #onDestinationChange = (evt) => {
     evt.preventDefault();
     const destination = this.#destinations.find((element) => element.name === evt.target.value);
-    this.updateElement({
-      destination: destination.id
+    if (destination) {
+      this.updateElement({
+        destination: destination.id
+      });
+    } else {
+      this.updateElement({
+        destination: null
+      });
+    }
+  };
+
+  #onPriceChange = (evt) => {
+    this._setState({
+      basePrice: evt.target.value
     });
   };
 
-  #onSubmit = (evt) => {
+  #onOfferChange = (evt) => {
     evt.preventDefault();
-    this.#handleSubmit();
+    const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
+    const realOffers = selectedOffers.map((item) => item.dataset.offerId);
+
+    this._setState({
+      offers: realOffers
+    });
   };
 
-  #onCancel = (evt) => {
+  #onEventSubmit = (evt) => {
     evt.preventDefault();
-    this.#handleCancel();
+    this.#handleFormSubmit(EditEventView.parseStateToEvent(this._state));
+  };
+
+  #onEventCancel = (evt) => {
+    evt.preventDefault();
+    this.#handleFormCancel();
+  };
+
+  #onFormDelete = (evt) => {
+    evt.preventDefault();
+    this.#handleEventDeleteClick(EditEventView.parseStateToEvent(this._state));
   };
 
   #setDatepickers() {
@@ -229,7 +264,6 @@ export default class EditEventView extends AbstractStatefulView {
       dateTo: userDate,
     });
   };
-
 
   static parseEventToState(event) {
     return { ...event };

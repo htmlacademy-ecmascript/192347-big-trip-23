@@ -1,13 +1,13 @@
 import EventView from '../view/event-view';
 import { render, replace, remove } from '../framework/render';
 import EditEventView from '../view/event-edit-view';
-import { updateItem } from '../utils';
-import { Mode } from '../const';
+import { Mode, UpdateType, UserAction } from '../const';
 
 export default class EventPresenter {
   #container = null;
   #eventModel = null;
   #event = null;
+  #updatedOffers = [];
 
   #eventItemView = null;
   #editEventView = null;
@@ -17,10 +17,11 @@ export default class EventPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({ container, eventModel, onEventUpdate, onModeChange }) {
+
+  constructor({ container, eventModel, onDataChange, onModeChange }) {
     this.#container = container;
     this.#eventModel = eventModel;
-    this.#handleTripEventChange = onEventUpdate;
+    this.#handleTripEventChange = onDataChange;
     this.#handleEditMode = onModeChange;
   }
 
@@ -47,13 +48,47 @@ export default class EventPresenter {
     this.#switchToViewMode();
   }
 
+  #renderEventItemView(event) {
+    const destinations = this.#eventModel.destinations;
+    const offers = this.#eventModel.offers;
+
+    const prevEventView = this.#eventItemView;
+
+
+    const onEditClick = () => this.#switchToEditMode();
+    const onFormCancel = () => this.#switchToViewMode();
+
+    this.#eventItemView = new EventView({
+      event,
+      offers,
+      destinations,
+      updatedOffers: this.#event.offers,
+      onEditClick: onEditClick,
+      onFavoriteClick: this.#handleFavoriteClick,
+    });
+
+    this.#editEventView = new EditEventView({
+      event,
+      offers,
+      destinations,
+      onFormCancel: onFormCancel,
+      onFormSubmit: this.#handleEventSubmit,
+      onFormDelete: this.#handleEventDeleteClick,
+    });
+
+    if (prevEventView === null) {
+      render(this.#eventItemView, this.#container);
+      return;
+    }
+    replace(this.#eventItemView, prevEventView);
+  }
+
   #switchToEditMode() {
     this.#handleEditMode();
     replace(this.#editEventView, this.#eventItemView);
 
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;
-
   }
 
   #switchToViewMode() {
@@ -71,40 +106,29 @@ export default class EventPresenter {
     }
   };
 
-  #renderEventItemView(event) {
-    const destinations = this.#eventModel.destinations;
-    const offers = this.#eventModel.offers;
+  #handleEventSubmit = (event) => {
+    this.#handleTripEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      event
+    );
+  };
 
-    const prevEventView = this.#eventItemView;
-
-
-    const onEditClick = () => this.#switchToEditMode();
-    const onFormSubmit = () => this.#switchToViewMode();
-    const onFormCancel = () => this.#switchToViewMode();
-
-    this.#eventItemView = new EventView({
+  #handleEventDeleteClick = (event) => {
+    this.#handleTripEventChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
       event,
-      offers,
-      destinations,
-      onEditClick: onEditClick,
-      onFavoriteClick: () => {
-        const updatedEvent = updateItem(event, { isFavorite: !event.isFavorite });
-        this.#handleTripEventChange(updatedEvent);
-      }
-    });
+    );
+  };
 
-    this.#editEventView = new EditEventView({
-      event,
-      offers,
-      destinations,
-      onFormSubmit: onFormSubmit,
-      onFormCancel: onFormCancel,
-    });
 
-    if (prevEventView === null) {
-      render(this.#eventItemView, this.#container);
-      return;
-    }
-    replace(this.#eventItemView, prevEventView);
-  }
+  #handleFavoriteClick = () => {
+    this.#handleTripEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      { ...this.#event, isFavorite: !this.#event.isFavorite },
+    );
+  };
+
 }

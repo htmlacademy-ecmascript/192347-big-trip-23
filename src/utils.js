@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DateFormat, SortType } from './const';
+import { DateFormat, SortType, FilterTypes } from './const';
 dayjs.extend(duration);
 
 function formatDate(date, dateFormat) {
@@ -8,7 +8,7 @@ function formatDate(date, dateFormat) {
 }
 
 const sortEventsBy = {
-  [SortType.DAY]: (events) => [...events],
+  [SortType.DAY]: (events) => [...events].sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom))),
   [SortType.TIME]: (events) => [...events].sort((a, b) => getTimeDifference(b.dateFrom, b.dateTo) - getTimeDifference(a.dateFrom, a.dateTo)),
   [SortType.PRICE]: (events) => [...events].sort((a, b) => b.basePrice - a.basePrice),
 };
@@ -33,7 +33,7 @@ function countDuration(dateFrom, dateTo) {
   if (days > 0) {
     eventDuration.push(dayjs(timeDifference).format(DateFormat.DAY));
   }
-  if (hours === 0 && days > 0) {
+  if (hours > 0 || (hours === 0 && days > 0)) {
     eventDuration.push(dayjs(timeDifference).format(DateFormat.HOUR));
   }
   if (minutes >= 0) {
@@ -52,4 +52,22 @@ const isEmpty = (list) => list.length === 0;
 const updateData = (data, update) => data.map((item) => item.id === update.id ? update : item);
 const updateItem = (item, prop) => ({ ...item, ...prop });
 
-export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents };
+const now = dayjs();
+
+const filter = {
+  [FilterTypes.EVERYTHING]: (events) => [...events],
+  [FilterTypes.FUTURE]: (events) => [...events].filter(({ dateFrom }) => dayjs(dateFrom).isAfter(now)),
+  [FilterTypes.PRESENT]: (events) => [...events].filter(({ dateFrom, dateTo }) => {
+    const start = dayjs(dateFrom);
+    const end = dayjs(dateTo);
+    return start.isBefore(now) && end.isAfter(now);
+  }),
+  [FilterTypes.PAST]: (events) => events.filter(({ dateTo }) => dayjs(dateTo).isBefore(now)),
+};
+
+function getFilteredSelectedOffers(event, typeOffers, updatedOffers = []) {
+  const selectedOffers = (updatedOffers.length > 0 ? updatedOffers : event.offers).map(Number);
+  return typeOffers.filter((offer) => selectedOffers.includes(offer.id));
+}
+
+export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents, sortEventsBy, filter, getFilteredSelectedOffers };

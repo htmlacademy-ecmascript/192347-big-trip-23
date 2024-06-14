@@ -1,7 +1,7 @@
 import TripInfoView from '../view/trip-info-view';
 import { render, RenderPosition } from '../framework/render';
 
-export default class HeaderPresenterPresenter {
+export default class HeaderPresenter {
   #tripInfoComponent = new TripInfoView();
   #container = null;
 

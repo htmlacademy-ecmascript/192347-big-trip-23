@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-
 const EVENT_TYPES = [
   'taxi',
   'bus',
@@ -21,8 +19,8 @@ const DatepickerConfig = {
 const getDefaultEvent = () => ({
   id: '',
   basePrice: 0,
-  dateFrom: dayjs(),
-  dateTo: dayjs(),
+  dateFrom: '2024-06-02T20:08:08.363Z',
+  dateTo: '2024-06-03T07:18:08.363Z',
   destination: 0,
   isFavorite: false,
   offers: [],
@@ -74,6 +72,18 @@ const Mode = {
   EDIT: 'EDIT',
 };
 
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 export {
   EVENT_TYPES,
   getDefaultEvent,
@@ -84,5 +94,7 @@ export {
   Mode,
   SortType,
   DISABLED_SORT_TYPES,
-  DatepickerConfig
+  DatepickerConfig,
+  UserAction,
+  UpdateType
 };
