@@ -1,3 +1,6 @@
+const AUTHORIZATION = 'Basic Gmsgv4iwthasaspsbl';
+const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
+
 const EVENT_TYPES = [
   'taxi',
   'bus',
@@ -82,9 +85,12 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export {
+  AUTHORIZATION,
+  END_POINT,
   EVENT_TYPES,
   getDefaultEvent,
   FilterTypes,

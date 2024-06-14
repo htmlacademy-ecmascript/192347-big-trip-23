@@ -1,7 +1,9 @@
 import EventModel from './model/event-model.js';
 import FilterModel from './model/filter-model.js';
+import EventApiService from './event-api-service.js';
 
 import { render, RenderPosition } from './framework/render.js';
+import { AUTHORIZATION, END_POINT } from './const.js';
 
 import FilterPresenter from './presenter/filter-presenter.js';
 import HeaderPresenter from './presenter/header-presenter.js';
@@ -13,7 +15,9 @@ const tripMainElement = pageBodyElement.querySelector('.trip-main');
 const controlsFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = pageBodyElement.querySelector('.trip-events');
 
-const eventModel = new EventModel();
+const eventModel = new EventModel({
+  eventApiService: new EventApiService(END_POINT, AUTHORIZATION)
+});
 const filterModel = new FilterModel();
 
 const tripPresenter = new TripPresenter(
@@ -50,8 +54,10 @@ function handleNewEventButtonClick() {
   newEventButtonComponent.element.disabled = true;
 }
 
-render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
-
 tripPresenter.init();
 headerPresenter.init();
 filterPresenter.init();
+eventModel.init()
+  .finally(() => {
+    render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
+  });

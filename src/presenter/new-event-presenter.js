@@ -11,8 +11,6 @@ export default class NewEventPresenter {
   #eventModel = null;
 
   #event = {};
-  #destinations = [];
-  #offers = [];
 
   #eventTypes = EVENT_TYPES;
 
@@ -21,8 +19,6 @@ export default class NewEventPresenter {
   constructor({ container, onDataChange, onEventDestroy, eventModel }) {
     this.#event = getDefaultEvent();
     this.#eventModel = eventModel;
-    this.#destinations = this.#eventModel.destinations;
-    this.#offers = this.#eventModel.offers;
     this.#container = container;
     this.#handleTripEventChange = onDataChange;
     this.#handleDestroy = onEventDestroy;
@@ -33,11 +29,14 @@ export default class NewEventPresenter {
       return;
     }
 
+    const destinations = this.#eventModel.destinations;
+    const offers = this.#eventModel.offers;
+
     this.#eventEditComponent = new EditEventView({
       event: this.#event,
-      offers: this.#offers,
+      offers,
       eventTypes: this.#eventTypes,
-      destinations: this.#destinations,
+      destinations,
       onFormSubmit: this.#handleFormSubmit,
       onFormDelete: this.#handleEventDeleteClick,
     });

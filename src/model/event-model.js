@@ -1,17 +1,36 @@
 import Observable from '../framework/observable';
-import { events } from '../mock/events';
-import { destinations } from '../mock/destination';
-import { offers } from '../mock/offers';
-import { SortType } from '../const';
+import { SortType, UpdateType } from '../const';
 
 export default class EventModel extends Observable {
-  #events = events;
-  #destinations = destinations;
-  #offers = offers;
+  #eventApiService = null;
+  #events = [];
+  #destinations = [];
+  #offers = [];
   #sortTypes = Object.values(SortType);
+
+  constructor({eventApiService}) {
+    super();
+
+    this.#eventApiService = eventApiService;
+
+  }
 
   get events() {
     return this.#events;
+  }
+
+  async init() {
+    try {
+      const events = await this.#eventApiService.events;
+      this.#events = events.map(this.#adaptToClient);
+      this.#destinations = await this.#eventApiService.destinations;
+      this.#offers = await this.#eventApiService.offers;
+    } catch(err) {
+      this.#events = [];
+      this.#destinations = [];
+      this.#offers = [];
+    }
+    this._notify(UpdateType.INIT);
   }
 
   get offers() {
@@ -26,20 +45,28 @@ export default class EventModel extends Observable {
     return this.#sortTypes;
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting event');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1),
-    ];
+    try {
+      const response = await this.#eventApiService.updateEvent(update);
+      const updatedEvent = this.#adaptToClient(response);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        updatedEvent,
+        ...this.#events.slice(index + 1),
+      ];
 
-    this._notify(updateType, update);
+      this._notify(updateType, update);
+    } catch (err) {
+      throw new Error('Can\'t update event');
+    }
+
+
   }
 
   addEvent(updateType, update) {
@@ -64,5 +91,21 @@ export default class EventModel extends Observable {
     ];
 
     this._notify(updateType);
+  }
+
+  #adaptToClient(event) {
+    const adaptedEvent = {...event,
+      basePrice: event['base_price'],
+      dateFrom:event['date_from'] !== null ? new Date(event['date_from']) : event['date_from'],
+      dateTo: event['date_to'] !== null ? new Date(event['date_to']) : event['date_to'],
+      isFavorite: event['is_favorite'],
+    };
+
+    delete adaptedEvent['base_price'];
+    delete adaptedEvent['date_from'];
+    delete adaptedEvent['date_to'];
+    delete adaptedEvent['is_favorite'];
+
+    return adaptedEvent;
   }
 }

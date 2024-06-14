@@ -6,6 +6,7 @@ import { isEmpty, sortEvents, filter } from '../utils';
 import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
+import LoadingMessageView from '../view/loading-message-view';
 
 
 export default class TripPresenter {
@@ -21,6 +22,8 @@ export default class TripPresenter {
   #filterType = DEFAULT_FILTER_TYPE;
   #handleNewPointDestroy = null;
   #activePresenter = null;
+  #loadingMessageComponent = new LoadingMessageView();
+  #isLoading = true;
 
 
   constructor({ container, eventModel, filterModel, onNewEventDestroy }) {
@@ -96,11 +99,20 @@ export default class TripPresenter {
     }
   };
 
+  #loadingMessageRendering() {
+    render(this.#loadingMessageComponent, this.#container);
+  }
+
   #eventsRendering() {
-    if (isEmpty(this.events)) {
+    if (isEmpty(this.events) && this.#isLoading !== true) {
 
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
+      return;
+    }
+
+    if (this.#isLoading) {
+      this.#loadingMessageRendering();
       return;
     }
 
@@ -153,6 +165,11 @@ export default class TripPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearEventList();
+        this.#eventsRendering();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingMessageComponent);
         this.#eventsRendering();
         break;
     }
