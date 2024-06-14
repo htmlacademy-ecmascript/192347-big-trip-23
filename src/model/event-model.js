@@ -1,8 +1,5 @@
 import Observable from '../framework/observable';
-import { events } from '../mock/events';
-import { destinations } from '../mock/destination';
-import { offers } from '../mock/offers';
-import { SortType } from '../const';
+import { SortType, UpdateType } from '../const';
 
 export default class EventModel extends Observable {
   #eventApiService = null;
