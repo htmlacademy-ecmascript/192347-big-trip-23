@@ -6,9 +6,9 @@ import { SortType } from '../const';
 
 export default class EventModel extends Observable {
   #eventApiService = null;
-  #events = events;
-  #destinations = destinations;
-  #offers = offers;
+  #events = [];
+  #destinations = [];
+  #offers = [];
   #sortTypes = Object.values(SortType);
 
   constructor({eventApiService}) {
@@ -31,6 +31,19 @@ export default class EventModel extends Observable {
 
   get events() {
     return this.#events;
+  }
+
+  async init() {
+    try {
+      const events = await this.#eventApiService.events;
+      this.#events = events.map(this.#adaptToClient);
+      this.#destinations = await this.#eventApiService.destinations;
+      this.#offers = await this.#eventApiService.offers;
+    } catch(err) {
+      this.#events = [];
+      this.#destinations = [];
+      this.#offers = [];
+    }
   }
 
   get offers() {

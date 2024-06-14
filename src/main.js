@@ -60,3 +60,4 @@ render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
 tripPresenter.init();
 headerPresenter.init();
 filterPresenter.init();
+eventModel.init();
