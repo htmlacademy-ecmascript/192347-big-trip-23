@@ -14,10 +14,6 @@ export default class EventModel extends Observable {
     return this.#events;
   }
 
-  // set events(tripEvents) {
-  //   this.#events = [...tripEvents];
-  // }
-
   get offers() {
     return this.#offers;
   }
