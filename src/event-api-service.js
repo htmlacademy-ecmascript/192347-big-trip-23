@@ -5,9 +5,9 @@ const Method = {
   PUT: 'PUT',
 };
 
-export default class EventsApiService extends ApiService {
+export default class EventApiService extends ApiService {
   get events() {
-    return this._load({ url: 'events' })
+    return this._load({ url: 'points' })
       .then(ApiService.parseResponse);
   }
 

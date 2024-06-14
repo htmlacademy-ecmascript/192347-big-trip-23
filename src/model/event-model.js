@@ -5,10 +5,29 @@ import { offers } from '../mock/offers';
 import { SortType } from '../const';
 
 export default class EventModel extends Observable {
+  #eventApiService = null;
   #events = events;
   #destinations = destinations;
   #offers = offers;
   #sortTypes = Object.values(SortType);
+
+  constructor({eventApiService}) {
+    super();
+
+    this.#eventApiService = eventApiService;
+
+    this.#eventApiService.events.then((events) => {
+      console.log(events);
+    });
+
+    this.#eventApiService.destinations.then((destinations) => {
+      console.log(destinations);
+    });
+
+    this.#eventApiService.offers.then((offers) => {
+      console.log(offers);
+    });
+  }
 
   get events() {
     return this.#events;
