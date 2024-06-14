@@ -44,6 +44,7 @@ export default class EventModel extends Observable {
       this.#destinations = [];
       this.#offers = [];
     }
+    this._notify(UpdateType.INIT);
   }
 
   get offers() {
