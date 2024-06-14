@@ -13,17 +13,6 @@ export default class EventModel extends Observable {
 
     this.#eventApiService = eventApiService;
 
-    this.#eventApiService.events.then((events) => {
-      console.log(events.map(this.#adaptToClient));
-    });
-
-    this.#eventApiService.destinations.then((destinations) => {
-      console.log(destinations);
-    });
-
-    this.#eventApiService.offers.then((offers) => {
-      console.log(offers);
-    });
   }
 
   get events() {
@@ -64,22 +53,19 @@ export default class EventModel extends Observable {
     }
 
     try {
-      console.log('Updating event:', update);
       const response = await this.#eventApiService.updateEvent(update);
-      console.log('Event updated successfully:', response);
       const updatedEvent = this.#adaptToClient(response);
       this.#events = [
         ...this.#events.slice(0, index),
         updatedEvent,
         ...this.#events.slice(index + 1),
       ];
-  
+
       this._notify(updateType, update);
     } catch (err) {
-      console.error('Failed to update event:', err);
       throw new Error('Can\'t update event');
     }
-  
+
 
   }
 

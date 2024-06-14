@@ -3,15 +3,8 @@ import { DateFormat, formatDate, countDuration, getFilteredSelectedOffers } from
 
 function createEventTemplate(event, offers, destinations, updatedOffers) {
   const { basePrice, dateFrom, dateTo, type, isFavorite } = event;
-  console.log('event.offers', event.offers);
-  console.log();
-
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
-  console.log('typeOffers', typeOffers);
-
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers, updatedOffers);
-  console.log('filteredSelectedOffers', filteredSelectedOffers);
-
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const dateAttribute = formatDate(dateFrom, DateFormat.ATTRIBUTE_DATE);
   const eventDate = formatDate(dateFrom, DateFormat.DATE);

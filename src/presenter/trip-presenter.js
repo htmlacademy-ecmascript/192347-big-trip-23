@@ -110,7 +110,7 @@ export default class TripPresenter {
       render(this.#emptyListView, this.#container);
       return;
     }
-    
+
     if (this.#isLoading) {
       this.#loadingMessageRendering();
       return;
