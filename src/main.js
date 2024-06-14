@@ -55,9 +55,10 @@ function handleNewEventButtonClick() {
   newEventButtonComponent.element.disabled = true;
 }
 
-render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
-
 tripPresenter.init();
 headerPresenter.init();
 filterPresenter.init();
-eventModel.init();
+eventModel.init()
+  .finally(() => {
+    render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
+  });
