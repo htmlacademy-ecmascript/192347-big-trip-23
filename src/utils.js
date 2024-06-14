@@ -66,7 +66,7 @@ const filter = {
 };
 
 function getFilteredSelectedOffers(event, typeOffers, updatedOffers = []) {
-  const selectedOffers = (updatedOffers.length > 0 ? updatedOffers : event.offers).map(Number);
+  const selectedOffers = (updatedOffers.length > 0 ? updatedOffers : event.offers).map(String);
   return typeOffers.filter((offer) => selectedOffers.includes(offer.id));
 }
 

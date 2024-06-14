@@ -136,6 +136,7 @@ export default class EditEventView extends AbstractStatefulView {
 
     this.#destinations = destinations;
     this.#offers = offers;
+    console.log('offers.id', offers);
     this.#handleFormSubmit = onFormSubmit;
     this.#handleFormCancel = onFormCancel;
     this.#handleEventDeleteClick = onFormDelete;
