@@ -1,6 +1,10 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createTripInfoTemplate() {
+function createTripInfoTemplate(events) {
+  const calculateTotalBasePrice = (events) => {
+    return events.reduce((total, event) => total + event.basePrice, 0);
+  };
+  const totalBasePrice = calculateTotalBasePrice(events);
   return (
     `
     <section class="trip-main__trip-info  trip-info">
@@ -11,15 +15,21 @@ function createTripInfoTemplate() {
     </div>
 
     <p class="trip-info__cost">
-      Total: €&nbsp;<span class="trip-info__cost-value">1230</span>
+      Total: €&nbsp;<span class="trip-info__cost-value">${totalBasePrice}</span>
     </p>
   </section>
   `
   );
 }
 
-export default class TripInfoView extends AbstractView{
+export default class TripInfoView extends AbstractView {
+  #events = null;
+
+  constructor({ events }) {
+    super();
+    this.#events = events;
+  }
   get template() {
-    return createTripInfoTemplate();
+    return createTripInfoTemplate(this.#events);
   }
 }

@@ -42,7 +42,7 @@ export default class EventApiService extends ApiService {
       url: 'points',
       method: Method.POST,
       body: JSON.stringify(this.#adaptToServer(event)),
-      headers: new Headers({'Content-Type': 'application/json'}),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
@@ -64,21 +64,21 @@ export default class EventApiService extends ApiService {
       ...event,
       'base_price': Number(event.basePrice),
       'is_favorite': event.isFavorite,
-'date_from': event.dateFrom instanceof Date ? event.dateFrom.toISOString() : null,
+      'date_from': event.dateFrom instanceof Date ? event.dateFrom.toISOString() : null,
       'date_to': event.dateTo instanceof Date ? event.dateTo.toISOString() : null,
     };
-  
+
     console.log('Before deletion:', adaptedEvent);
-  
+
     // Удаляем исходные свойства
     delete adaptedEvent.basePrice;
     delete adaptedEvent.isFavorite;
     delete adaptedEvent.dateFrom;
     delete adaptedEvent.dateTo;
-  
+
     console.log('After deletion:', adaptedEvent);
-  
+
     return adaptedEvent;
   }
-  
+
 }

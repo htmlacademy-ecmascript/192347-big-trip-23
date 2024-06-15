@@ -20,9 +20,6 @@ const DatepickerConfig = {
   'time_24hr': true,
 };
 
-
-
-
 const getDefaultEvent = () => ({
 
   basePrice: Number(0),

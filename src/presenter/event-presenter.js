@@ -48,7 +48,7 @@ export default class EventPresenter {
   }
 
   setSaving() {
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === Mode.EDIT) {
       this.#editEventView.updateElement({
         isDisabled: true,
         isSaving: true,
@@ -57,7 +57,7 @@ export default class EventPresenter {
   }
 
   setDeleting() {
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === Mode.EDIT) {
       this.#editEventView.updateElement({
         isDisabled: true,
         isDeleting: true,

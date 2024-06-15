@@ -6,19 +6,17 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/material_blue.css';
 
-function editEventTemplate(event, destinations, offers ) {
-  const { basePrice, dateFrom, dateTo, type, isDisable, isSaving, isDeleting } = event;
-
-
-
-  // console.log('isDisable', isDisable);
-  // console.log('isSaving', isSaving);
-  // console.log('isDeleting', isDeleting);
-
+function editEventTemplate(event, destinations, offers) {
+  const { basePrice, dateFrom, dateTo, type, isDisabled, isSaving, isDeleting } = event;
   const eventId = event.id;
 
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
+  console.log(filteredSelectedOffers);
+  const total = filteredSelectedOffers.reduce((sum, event) => sum + event.price, 0);
+
+  console.log(total);
+
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
@@ -76,12 +74,12 @@ function editEventTemplate(event, destinations, offers ) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice}" min="1" max="100000">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice + total}" min="1" max="100000">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisable ? 'disabled' : ''}>${isSaving ? 'Saving' : 'Save'}</button>
-        <button class="event__reset-btn" type="reset" ${isDisable ? 'disabled' : ''}>
-        ${eventId ? (isDeleting ? 'Deleting' : 'Delete') : 'Cancel'}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+        ${eventId ? (isDeleting ? 'Deleting...' : 'Delete') : 'Cancel'}</button>
         ${eventId ? (
       `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -96,7 +94,7 @@ function editEventTemplate(event, destinations, offers ) {
 
       <div class="event__available-offers">
       ${typeOffers.map((typeOffer) => (
-      `<div class="event__offer-selector">
+        `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredSelectedOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${typeOffer.title}-${eventId}">
           <span class="event__offer-title">${typeOffer.title}</span>
@@ -104,7 +102,7 @@ function editEventTemplate(event, destinations, offers ) {
           <span class="event__offer-price">${typeOffer.price}</span>
         </label>
       </div>`
-    )).join('')}
+      )).join('')}
       </div>
       </section>`
       : ''}
@@ -150,7 +148,7 @@ export default class EditEventView extends AbstractStatefulView {
     this._restoreHandlers();
     this.#setDatepickers();
   }
-  
+
   get template() {
     return editEventTemplate(this._state, this.#destinations, this.#offers);
   }
@@ -177,7 +175,7 @@ export default class EditEventView extends AbstractStatefulView {
       this.#datepickerEnd = null;
     }
   }
-  
+
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onEventSubmit);
     this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onEventCancel);
@@ -209,7 +207,7 @@ export default class EditEventView extends AbstractStatefulView {
       });
     }
   };
-  
+
 
   #onPriceChange = (evt) => {
     this._setState({
@@ -266,25 +264,25 @@ export default class EditEventView extends AbstractStatefulView {
   #onDateStartChange = ([userDate]) => {
     const currentEndDate = this._state.dateTo instanceof Date ? this._state.dateTo : new Date(this._state.dateTo);
     const newDateEnd = new Date(userDate.getTime() + 60000); // +1 минута
-  
+
     // Проверка и сравнение дат
     if (userDate >= currentEndDate) {
       this.updateElement({
         dateFrom: userDate,
         dateTo: newDateEnd
       });
-      
+
       this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
       this.#datepickerEnd.setDate(newDateEnd, false); // Устанавливает новую дату окончания, не вызывая событие изменения
     } else {
       this.updateElement({
         dateFrom: userDate
       });
-  
+
       this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
     }
   };
-  
+
 
   #onDateEndChange = ([userDate]) => {
     this.updateElement({
@@ -293,12 +291,13 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
   static parseEventToState(event) {
-    
-    return { ...event,
+
+    return {
+      ...event,
       isDisabled: false,
       isSaving: false,
       isDeleting: false,
-     };
+    };
   }
 
   static parseStateToEvent(state) {

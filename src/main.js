@@ -30,7 +30,8 @@ const tripPresenter = new TripPresenter(
 );
 const headerPresenter = new HeaderPresenter(
   {
-    container: tripMainElement
+    container: tripMainElement,
+    eventModel: eventModel,
   }
 );
 const filterPresenter = new FilterPresenter(

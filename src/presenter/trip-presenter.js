@@ -161,14 +161,14 @@ export default class TripPresenter {
 
   #handleViewAction = async (actionType, updateType, update) => {
 
-    this.#uiBlocker.block();
+    // this.#uiBlocker.block();
 
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventModel.updateEvent(updateType, update);
-        } catch {
+        } catch(err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -176,20 +176,20 @@ export default class TripPresenter {
         this.#newEventPresenter.setSaving();
         try {
           await this.#eventModel.addEvent(updateType, update);
-        } catch {
+        } catch(err) {
           this.#newEventPresenter.setAborting();
         }
         break;
       case UserAction.DELETE_EVENT:
+        this.#eventPresenters.get(update.id).setDeleting();
         try {
           await this.#eventModel.deleteEvent(updateType, update);
-        } catch {
+        } catch(err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
-        this.#eventModel.deleteEvent(updateType, update);
         break;
     }
-    this.#uiBlocker.unblock();
+    // this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
