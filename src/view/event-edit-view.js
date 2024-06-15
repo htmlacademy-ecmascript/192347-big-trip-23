@@ -6,15 +6,21 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/material_blue.css';
 
-function editEventTemplate(event, destinations, offers) {
-  const { basePrice, dateFrom, dateTo, type } = event;
+function editEventTemplate(event, destinations, offers ) {
+  const { basePrice, dateFrom, dateTo, type, isDisable, isSaving, isDeleting } = event;
 
+
+
+  // console.log('isDisable', isDisable);
+  // console.log('isSaving', isSaving);
+  // console.log('isDeleting', isDeleting);
+
+  const eventId = event.id;
 
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
-  const eventId = event.id;
   const { name, description, pictures } = currentDestination || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
@@ -73,8 +79,9 @@ function editEventTemplate(event, destinations, offers) {
           <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice}" min="1" max="100000">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${eventId ? 'Delete' : 'Cancel'}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisable ? 'disabled' : ''}>${isSaving ? 'Saving' : 'Save'}</button>
+        <button class="event__reset-btn" type="reset" ${isDisable ? 'disabled' : ''}>
+        ${eventId ? (isDeleting ? 'Deleting' : 'Delete') : 'Cancel'}</button>
         ${eventId ? (
       `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -143,7 +150,7 @@ export default class EditEventView extends AbstractStatefulView {
     this._restoreHandlers();
     this.#setDatepickers();
   }
-
+  
   get template() {
     return editEventTemplate(this._state, this.#destinations, this.#offers);
   }
@@ -170,7 +177,7 @@ export default class EditEventView extends AbstractStatefulView {
       this.#datepickerEnd = null;
     }
   }
-
+  
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#onEventSubmit);
     this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onEventCancel);
@@ -202,6 +209,7 @@ export default class EditEventView extends AbstractStatefulView {
       });
     }
   };
+  
 
   #onPriceChange = (evt) => {
     this._setState({
@@ -285,10 +293,21 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
   static parseEventToState(event) {
-    return { ...event };
+    
+    return { ...event,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+     };
   }
 
   static parseStateToEvent(state) {
-    return { ...state };
+    const event = { ...state }
+
+    delete event.isDisabled;
+    delete event.isSaving;
+    delete event.isDeleting;
+
+    return event;
   }
 }

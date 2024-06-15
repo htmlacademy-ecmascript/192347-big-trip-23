@@ -55,9 +55,9 @@ function handleNewEventButtonClick() {
 }
 
 tripPresenter.init();
-headerPresenter.init();
-filterPresenter.init();
 eventModel.init()
   .finally(() => {
     render(newEventButtonComponent, tripMainElement, RenderPosition.BEFOREEND);
+    headerPresenter.init();
+    filterPresenter.init();
   });

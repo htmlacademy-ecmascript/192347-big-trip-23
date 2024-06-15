@@ -1,4 +1,4 @@
-const AUTHORIZATION = 'Basic Gmsgv4iwthasaspsbl';
+const AUTHORIZATION = 'Basic msgviwthasaspsbl';
 const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
 
 
@@ -27,7 +27,7 @@ const getDefaultEvent = () => ({
 
   basePrice: Number(0),
   dateFrom: new Date(),
-  dateTo: new Date(new Date().valueOf() + 1000 * 3600 * 24),
+  dateTo: new Date(new Date().valueOf() + 60000),
   destination: 0,
   isFavorite: false,
   offers: [],

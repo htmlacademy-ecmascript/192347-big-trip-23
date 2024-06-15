@@ -47,6 +47,24 @@ export default class EventPresenter {
     this.#switchToViewMode();
   }
 
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editEventView.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editEventView.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;

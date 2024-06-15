@@ -49,7 +49,7 @@ export default class NewEventPresenter {
     if (this.#eventEditComponent === null) {
       return;
     }
-
+    
     this.#handleDestroy();
 
     remove(this.#eventEditComponent);
@@ -58,14 +58,23 @@ export default class NewEventPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   }
 
+  setSaving() {
+    this.#eventEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
   #handleFormSubmit = (event) => {
     console.log('Submitting event:', event);
+
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       event,
     );
     console.log(event);
+    
     this.destroy();
   };
 

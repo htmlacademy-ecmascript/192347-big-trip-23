@@ -66,6 +66,16 @@ export default class TripPresenter {
       this.#activePresenter.destroy();
     }
 
+    const tripEventsElement = document.querySelector('.trip-events__list');
+
+    if (tripEventsElement === null) {
+      render(this.#eventListComponent, this.#container);
+    }
+
+    if (this.#newEventPresenter !== null) {
+      remove(this.#emptyListView);
+    }
+
     this.#newEventPresenter.init();
     this.#activePresenter = this.#newEventPresenter;
   }
@@ -143,12 +153,15 @@ export default class TripPresenter {
 
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
+        this.#eventPresenters.get(update.id).setSaving();
         this.#eventModel.updateEvent(updateType, update);
         break;
       case UserAction.ADD_EVENT:
+        this.#newEventPresenter.setSaving();
         this.#eventModel.addEvent(updateType, update);
         break;
       case UserAction.DELETE_EVENT:
+        this.#eventPresenters.get(update.id).setDeleting();
         this.#eventModel.deleteEvent(updateType, update);
         break;
     }
