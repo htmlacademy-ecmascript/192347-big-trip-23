@@ -7,6 +7,12 @@ import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } fr
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
 import LoadingMessageView from '../view/loading-message-view';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 
 export default class TripPresenter {
@@ -24,6 +30,10 @@ export default class TripPresenter {
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
 
   constructor({ container, eventModel, filterModel, onNewEventDestroy }) {
@@ -151,6 +161,8 @@ export default class TripPresenter {
 
   #handleViewAction = async (actionType, updateType, update) => {
 
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventPresenters.get(update.id).setSaving();
@@ -177,6 +189,7 @@ export default class TripPresenter {
         this.#eventModel.deleteEvent(updateType, update);
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
