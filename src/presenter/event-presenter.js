@@ -65,6 +65,23 @@ export default class EventPresenter {
     }
   }
 
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#editEventView.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editEventView.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editEventView.shake(resetFormState);
+  }
+
   #renderEventItemView(event) {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;

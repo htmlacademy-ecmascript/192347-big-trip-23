@@ -149,19 +149,31 @@ export default class TripPresenter {
     });
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
 
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventPresenters.get(update.id).setSaving();
-        this.#eventModel.updateEvent(updateType, update);
+        try {
+          await this.#eventModel.updateEvent(updateType, update);
+        } catch {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_EVENT:
         this.#newEventPresenter.setSaving();
-        this.#eventModel.addEvent(updateType, update);
+        try {
+          await this.#eventModel.addEvent(updateType, update);
+        } catch {
+          this.#newEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_EVENT:
-        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventModel.deleteEvent(updateType, update);
+        } catch {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         this.#eventModel.deleteEvent(updateType, update);
         break;
     }

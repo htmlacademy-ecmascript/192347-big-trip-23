@@ -77,7 +77,7 @@ export default class EventModel extends Observable {
         addEvent,
         ...this.#events,
       ];
-      console.log(this.#events);
+
       this._notify(updateType, update);
     } catch(err) {
       throw new Error('Can\'t add event');
@@ -92,9 +92,6 @@ export default class EventModel extends Observable {
       throw new Error('Can\'t delete unexisting event');
     }
     try {
-      // Обратите внимание, метод удаления задачи на сервере
-      // ничего не возвращает. Это и верно,
-      // ведь что можно вернуть при удалении задачи?
       await this.#eventApiService.deleteEvent(update);
       this.#events = [
         ...this.#events.slice(0, index),
