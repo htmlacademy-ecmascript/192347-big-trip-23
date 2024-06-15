@@ -1,6 +1,5 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EditEventView from '../view/event-edit-view.js';
-import { nanoid } from 'nanoid';
 import { UserAction, UpdateType, EVENT_TYPES, getDefaultEvent } from '../const.js';
 
 export default class NewEventPresenter {
