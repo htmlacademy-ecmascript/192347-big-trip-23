@@ -69,28 +69,41 @@ export default class EventModel extends Observable {
 
   }
 
-  addEvent(updateType, update) {
-    this.#events = [
-      update,
-      ...this.#events,
-    ];
-
+  async addEvent(updateType, update) {
+    try {
+      const response = await this.#eventApiService.addEvent(update);
+      const addEvent = this.#adaptToClient(response);
+      this.#events = [
+        addEvent,
+        ...this.#events,
+      ];
+      console.log(this.#events);
+      this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t add event');
+    }
     this._notify(updateType, update);
   }
 
-  deleteEvent(updateType, update) {
+  async deleteEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting event');
     }
-
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1),
-    ];
-
-    this._notify(updateType);
+    try {
+      // Обратите внимание, метод удаления задачи на сервере
+      // ничего не возвращает. Это и верно,
+      // ведь что можно вернуть при удалении задачи?
+      await this.#eventApiService.deleteEvent(update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        ...this.#events.slice(index + 1),
+      ];
+      this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
   }
 
   #adaptToClient(event) {

@@ -136,6 +136,7 @@ export default class EditEventView extends AbstractStatefulView {
 
     this.#destinations = destinations;
     this.#offers = offers;
+
     this.#handleFormSubmit = onFormSubmit;
     this.#handleFormCancel = onFormCancel;
     this.#handleEventDeleteClick = onFormDelete;
@@ -238,7 +239,8 @@ export default class EditEventView extends AbstractStatefulView {
       {
         ...DatepickerConfig,
         defaultDate: this._state.dateFrom,
-        maxDate: this._state.dateTo,
+        // minDate: this._state.dateFrom,
+
         onChange: this.#onDateStartChange,
       },
     );
@@ -254,10 +256,27 @@ export default class EditEventView extends AbstractStatefulView {
   }
 
   #onDateStartChange = ([userDate]) => {
-    this.updateElement({
-      dateFrom: userDate,
-    });
+    const currentEndDate = this._state.dateTo instanceof Date ? this._state.dateTo : new Date(this._state.dateTo);
+    const newDateEnd = new Date(userDate.getTime() + 60000); // +1 минута
+  
+    // Проверка и сравнение дат
+    if (userDate >= currentEndDate) {
+      this.updateElement({
+        dateFrom: userDate,
+        dateTo: newDateEnd
+      });
+      
+      this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
+      this.#datepickerEnd.setDate(newDateEnd, false); // Устанавливает новую дату окончания, не вызывая событие изменения
+    } else {
+      this.updateElement({
+        dateFrom: userDate
+      });
+  
+      this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
+    }
   };
+  
 
   #onDateEndChange = ([userDate]) => {
     this.updateElement({

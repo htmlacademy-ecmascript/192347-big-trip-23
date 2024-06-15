@@ -60,11 +60,13 @@ export default class NewEventPresenter {
   }
 
   #handleFormSubmit = (event) => {
+    console.log('Submitting event:', event);
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      { ...event, id: nanoid() },
+      event,
     );
+    console.log(event);
     this.destroy();
   };
 

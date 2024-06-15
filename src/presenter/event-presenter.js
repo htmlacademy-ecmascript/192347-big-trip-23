@@ -7,7 +7,6 @@ export default class EventPresenter {
   #container = null;
   #eventModel = null;
   #event = null;
-  #updatedOffers = [];
 
   #eventItemView = null;
   #editEventView = null;

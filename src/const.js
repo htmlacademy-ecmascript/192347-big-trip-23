@@ -1,5 +1,7 @@
 const AUTHORIZATION = 'Basic Gmsgv4iwthasaspsbl';
 const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
+import dayjs from "dayjs";
+import { nanoid } from "nanoid";
 
 const EVENT_TYPES = [
   'taxi',
@@ -19,11 +21,14 @@ const DatepickerConfig = {
   'time_24hr': true,
 };
 
+
+
+
 const getDefaultEvent = () => ({
-  id: '',
-  basePrice: 0,
-  dateFrom: '2024-06-02T20:08:08.363Z',
-  dateTo: '2024-06-03T07:18:08.363Z',
+  // id: nanoid(),
+  basePrice: Number(0),
+  dateFrom: new Date(),
+  dateTo: new Date(new Date().valueOf() + 1000 * 3600 * 24),
   destination: 0,
   isFavorite: false,
   offers: [],
