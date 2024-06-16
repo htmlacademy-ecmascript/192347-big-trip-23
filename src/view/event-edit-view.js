@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES, DatepickerConfig } from '../const.js';
+import { getInteger } from '../utils.js';
 import { capitalizeFirstLetter, formatDate, DateFormat, getFilteredSelectedOffers } from '../utils.js';
 import he from 'he';
 import flatpickr from 'flatpickr';
@@ -12,11 +13,8 @@ function editEventTemplate(event, destinations, offers) {
 
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
-  console.log(filteredSelectedOffers);
-  const total = filteredSelectedOffers.reduce((sum, event) => sum + event.price, 0);
 
-  console.log(total);
-
+  const totalPrice = basePrice + filteredSelectedOffers.reduce((sum, event) => sum + event.price, 0);
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
@@ -74,7 +72,7 @@ function editEventTemplate(event, destinations, offers) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${basePrice + total}" min="1" max="100000">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${totalPrice}" min="1" max="100000">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -184,6 +182,8 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#onOfferChange);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#onPriceInput);
+
     this.#setDatepickers();
   }
 
@@ -209,10 +209,10 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
 
-  #onPriceChange = (evt) => {
-    this._setState({
-      basePrice: evt.target.value
-    });
+  #onPriceChange = (evt) => this._setState({ basePrice: getInteger(evt.target.value) });
+
+  #onPriceInput = (evt) => {
+    evt.target.value = getInteger(evt.target.value);
   };
 
   #onOfferChange = (evt) => {

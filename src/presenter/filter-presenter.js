@@ -55,7 +55,6 @@ export default class FilterPresenterPresenter {
     if (this.#filterModel.filter === FilterTypes) {
       return;
     }
-
     this.#filterModel.setFilter(UpdateType.MAJOR, filterTypes);
   };
 }

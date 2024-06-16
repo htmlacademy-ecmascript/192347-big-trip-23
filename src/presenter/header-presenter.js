@@ -1,13 +1,13 @@
 import TripInfoView from '../view/trip-info-view';
-import { render, RenderPosition } from '../framework/render';
-import { isEmpty, sortEvents, filter } from '../utils';
+import { remove, render, replace, RenderPosition } from '../framework/render';
+import { sortEvents, filter } from '../utils';
 import { SortType } from '../const';
-
 
 export default class HeaderPresenter {
   #tripInfoComponent = null;
   #container = null;
-  #eventModel = null
+  #eventModel = null;
+  #prevTripInfoView = null;
 
   constructor({ container, eventModel }) {
     this.#container = container;
@@ -24,16 +24,24 @@ export default class HeaderPresenter {
   }
 
   init() {
-    console.log(this.events);
+    const destinations = this.#eventModel.destinations;
+
     this.#tripInfoComponent = new TripInfoView({
-      events: this.events
+      events: this.events,
+      destinations
     });
-    render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
+
+    if (this.#prevTripInfoView === null) {
+      render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
+    } else {
+      replace(this.#tripInfoComponent, this.#prevTripInfoView);
+      remove(this.#prevTripInfoView);
+    }
+
+    this.#prevTripInfoView = this.#tripInfoComponent;
   }
 
   #onModelEvent = () => {
-    if (this.#tripInfoComponent) {
-      this.#tripInfoComponent.destroy();
-    }
+    this.init();
   };
 }

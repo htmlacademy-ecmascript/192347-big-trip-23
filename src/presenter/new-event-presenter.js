@@ -15,12 +15,12 @@ export default class NewEventPresenter {
 
   #eventEditComponent = null;
 
-  constructor({ container, onDataChange, onEventDestroy, eventModel }) {
+  constructor({ container, onDataChange, onNewEventDestroy, eventModel }) {
     this.#event = getDefaultEvent();
     this.#eventModel = eventModel;
     this.#container = container;
     this.#handleTripEventChange = onDataChange;
-    this.#handleDestroy = onEventDestroy;
+    this.#handleDestroy = onNewEventDestroy;
   }
 
   init() {
@@ -77,15 +77,12 @@ export default class NewEventPresenter {
   }
 
   #handleFormSubmit = (event) => {
-    console.log('Submitting event:', event);
 
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       event,
-    );
-    console.log(event);
-    
+    );    
     this.destroy();
   };
 

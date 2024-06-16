@@ -1,4 +1,4 @@
-const AUTHORIZATION = 'Basic msgviwthasaspsbl';
+const AUTHORIZATION = 'Basic msgviwhasasdf56bl';
 const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
 
 
@@ -61,6 +61,7 @@ const EventEmptyListMessages = {
 };
 
 const DateFormat = {
+  DATE_MONTH: 'DD MMM',
   DATE: 'MMM DD',
   TIME: 'HH:mm',
   ATTRIBUTE_DATE_TIME: 'YYYY-MM-DDTHH:mm',

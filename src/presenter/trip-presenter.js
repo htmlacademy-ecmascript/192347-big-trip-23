@@ -26,10 +26,11 @@ export default class TripPresenter {
   #sortView = null;
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
-  #handleNewPointDestroy = null;
+  // #handleNewPointDestroy = null;
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
   #isLoading = true;
+  #isError = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -41,14 +42,14 @@ export default class TripPresenter {
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
-    this.#handleNewPointDestroy = onNewEventDestroy;
+    // this.#handleNewPointDestroy = onNewEventDestroy;
 
 
     this.#newEventPresenter = new NewEventPresenter({
       eventModel: this.#eventModel,
       container: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
-      onEventDestroy: this.#handleNewPointDestroy,
+      onNewEventDestroy: this.#handleNewPointDestroy,
     });
 
     this.#eventModel.addObserver(this.#handleModelEvent);
@@ -88,6 +89,17 @@ export default class TripPresenter {
 
     this.#newEventPresenter.init();
     this.#activePresenter = this.#newEventPresenter;
+  }
+
+  #handleNewPointDestroy = () => {
+    const newButton = document.querySelector('.trip-main__event-add-btn');
+
+    if (isEmpty(this.events) && this.#isLoading !== true) {
+      this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
+      render(this.#emptyListView, this.#container);
+      newButton.removeAttribute('disabled');
+      return;
+    }
   }
 
   #handleSortTypeChange = (nextSortType) => {
@@ -177,6 +189,7 @@ export default class TripPresenter {
         try {
           await this.#eventModel.addEvent(updateType, update);
         } catch(err) {
+          console.log(err);
           this.#newEventPresenter.setAborting();
         }
         break;
@@ -185,6 +198,7 @@ export default class TripPresenter {
         try {
           await this.#eventModel.deleteEvent(updateType, update);
         } catch(err) {
+          console.log(err);
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;

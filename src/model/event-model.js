@@ -91,6 +91,7 @@ export default class EventModel extends Observable {
     if (index === -1) {
       throw new Error('Can\'t delete unexisting event');
     }
+
     try {
       await this.#eventApiService.deleteEvent(update);
       this.#events = [
@@ -99,7 +100,7 @@ export default class EventModel extends Observable {
       ];
       this._notify(updateType);
     } catch(err) {
-      throw new Error('Can\'t delete task');
+      throw new Error('Can\'t delete event');
     }
   }
 

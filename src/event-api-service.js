@@ -68,15 +68,10 @@ export default class EventApiService extends ApiService {
       'date_to': event.dateTo instanceof Date ? event.dateTo.toISOString() : null,
     };
 
-    console.log('Before deletion:', adaptedEvent);
-
-    // Удаляем исходные свойства
     delete adaptedEvent.basePrice;
     delete adaptedEvent.isFavorite;
     delete adaptedEvent.dateFrom;
     delete adaptedEvent.dateTo;
-
-    console.log('After deletion:', adaptedEvent);
 
     return adaptedEvent;
   }
