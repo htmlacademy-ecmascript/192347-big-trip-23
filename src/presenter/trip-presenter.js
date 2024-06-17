@@ -81,9 +81,7 @@ export default class TripPresenter {
       this.#activePresenter.destroy();
     }
 
-    const tripEventsElement = document.querySelector('.trip-events__list');
-
-    if (tripEventsElement === null) {
+    if (!this.#eventListComponent.element.parentElement) {
       render(this.#eventListComponent, this.#container);
     }
 
