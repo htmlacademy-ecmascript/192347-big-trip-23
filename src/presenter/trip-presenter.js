@@ -7,6 +7,7 @@ import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } fr
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
 import LoadingMessageView from '../view/loading-message-view';
+import FailedMessageView from '../view/failed-message-view'; 
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const TimeLimit = {
@@ -28,10 +29,11 @@ export default class TripPresenter {
   #filterType = DEFAULT_FILTER_TYPE;
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
+  #failedMessageComponent = new FailedMessageView(); 
   #isLoading = true;
   #newEventButtonComponent = null;
   #tripMainElementContainer = null;
-  #isError = false;
+  // #isError = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -61,12 +63,14 @@ export default class TripPresenter {
   get events() {
     this.#filterType = this.#filterModel.filter;
     const events = this.#eventModel.events;
+
     const filteredEvents = filter[this.#filterType](events);
     const sortedEvents = sortEvents(filteredEvents, this.#currentSortType);
     return sortedEvents;
   }
 
   init() {
+
     this.#clearEventList();
     this.#eventsRendering();
   }
@@ -135,12 +139,20 @@ export default class TripPresenter {
     render(this.#loadingMessageComponent, this.#container);
   }
 
+  #failedMessageRendering() {  
+    render(this.#failedMessageComponent, this.#container);
+  }
+
   #newEventButtonRendering() {
     render(this.#newEventButtonComponent, this.#tripMainElementContainer, RenderPosition.BEFOREEND);
   }
 
   #eventsRendering() {
-    if (isEmpty(this.events) && this.#isLoading !== true) {
+    if(this.#eventModel.isError) {
+      this.#failedMessageRendering();
+      return;
+    }
+    if (isEmpty(this.events) && this.#isLoading !== true && !this.#eventModel.isError) {
       this.#newEventButtonRendering();
 
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
@@ -179,7 +191,7 @@ export default class TripPresenter {
 
   #handleViewAction = async (actionType, updateType, update) => {
 
-    // this.#uiBlocker.block();
+    this.#uiBlocker.block();
 
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
@@ -209,7 +221,7 @@ export default class TripPresenter {
         }
         break;
     }
-    // this.#uiBlocker.unblock();
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {

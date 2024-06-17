@@ -7,6 +7,7 @@ export default class EventModel extends Observable {
   #destinations = [];
   #offers = [];
   #sortTypes = Object.values(SortType);
+  isError = false;
 
   constructor({eventApiService}) {
     super();
@@ -29,6 +30,7 @@ export default class EventModel extends Observable {
       this.#events = [];
       this.#destinations = [];
       this.#offers = [];
+      this.isError = true;
     }
     this._notify(UpdateType.INIT);
   }
