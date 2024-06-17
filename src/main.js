@@ -21,7 +21,7 @@ const eventModel = new EventModel({
 const filterModel = new FilterModel();
 
 const newEventButtonComponent = new NewButtonView({
-  onButtonClick: handleNewEventButtonClick
+  onNewButtonClick: handleNewEventButtonClick
 });
 
 const tripPresenter = new TripPresenter(

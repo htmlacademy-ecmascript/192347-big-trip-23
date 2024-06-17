@@ -26,7 +26,6 @@ export default class TripPresenter {
   #sortView = null;
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
-  // #handleNewPointDestroy = null;
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
   #isLoading = true;
@@ -39,13 +38,12 @@ export default class TripPresenter {
   });
 
 
-  constructor({ container, eventModel, filterModel, onNewEventDestroy, newEventButtonComponent, tripMainElementContainer }) {
+  constructor({ container, eventModel, filterModel, newEventButtonComponent, tripMainElementContainer }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
     this.#newEventButtonComponent = newEventButtonComponent;
-    this.#handleNewPointDestroy = onNewEventDestroy;
     this.#tripMainElementContainer = tripMainElementContainer;
 
 
@@ -95,10 +93,10 @@ export default class TripPresenter {
 
   #handleNewPointDestroy = () => {
     this.#newEventButtonComponent.element.disabled = false;
-    if (isEmpty(this.events) && this.#isLoading !== true) {
+  
+    if (isEmpty(this.events)) {
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
-      return;
     }
   }
 

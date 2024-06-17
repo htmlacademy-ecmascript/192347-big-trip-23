@@ -5,7 +5,7 @@ import { UserAction, UpdateType, EVENT_TYPES, getDefaultEvent } from '../const.j
 export default class NewEventPresenter {
   #container = null;
   #handleTripEventChange = null;
-  #handleDestroy = null;
+  #handleNewEventDestroy = null;
   #eventModel = null;
   #event = {};
   #eventTypes = EVENT_TYPES;
@@ -16,7 +16,7 @@ export default class NewEventPresenter {
     this.#eventModel = eventModel;
     this.#container = container;
     this.#handleTripEventChange = onDataChange;
-    this.#handleDestroy = onNewEventDestroy;
+    this.#handleNewEventDestroy = onNewEventDestroy;
   }
 
   init() {
@@ -34,7 +34,6 @@ export default class NewEventPresenter {
       destinations,
       onFormSubmit: this.#handleFormSubmit,
       onFormDelete: this.#handleEventDeleteClick,
-      onCancelClick: this.#handleEventDeleteClick // Добавил обработчик для кнопки Cancel
     });
 
     render(this.#eventEditComponent, this.#container, RenderPosition.AFTERBEGIN);
@@ -47,7 +46,7 @@ export default class NewEventPresenter {
       return;
     }
     
-    this.#handleDestroy(); // Переместил вызов сюда, чтобы убедиться, что он выполняется при уничтожении
+    this.#handleNewEventDestroy(); 
 
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
