@@ -45,8 +45,8 @@ export default class NewEventPresenter {
     if (this.#eventEditComponent === null) {
       return;
     }
-    
-    this.#handleNewEventDestroy(); 
+
+    this.#handleNewEventDestroy();
 
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
@@ -77,7 +77,7 @@ export default class NewEventPresenter {
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       event,
-    );    
+    );
     this.destroy();
   };
 

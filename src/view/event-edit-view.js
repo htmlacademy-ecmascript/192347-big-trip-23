@@ -14,13 +14,15 @@ function editEventTemplate(event, destinations, offers) {
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
 
-  const totalPrice = basePrice + filteredSelectedOffers.reduce((sum, event) => sum + event.price, 0);
+  const totalPrice = basePrice + filteredSelectedOffers.reduce((sum, currentOffer) => sum + currentOffer.price, 0);
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
+
+  const deleteButtonText = eventId ? (isDeleting ? 'Deleting...' : 'Delete') : 'Cancel';
 
   return (
     `
@@ -77,7 +79,7 @@ function editEventTemplate(event, destinations, offers) {
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
         <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
-        ${eventId ? (isDeleting ? 'Deleting...' : 'Delete') : 'Cancel'}</button>
+        ${deleteButtonText}</button>
         ${eventId ? (
       `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -92,7 +94,7 @@ function editEventTemplate(event, destinations, offers) {
 
       <div class="event__available-offers">
       ${typeOffers.map((typeOffer) => (
-        `<div class="event__offer-selector">
+      `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeOffer.title}-${eventId}" type="checkbox" name="event-offer-${typeOffer.title}" data-offer-id="${typeOffer.id}" ${filteredSelectedOffers.map((offer) => offer.id).includes(typeOffer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${typeOffer.title}-${eventId}">
           <span class="event__offer-title">${typeOffer.title}</span>
@@ -100,7 +102,7 @@ function editEventTemplate(event, destinations, offers) {
           <span class="event__offer-price">${typeOffer.price}</span>
         </label>
       </div>`
-      )).join('')}
+    )).join('')}
       </div>
       </section>`
       : ''}
@@ -301,7 +303,7 @@ export default class EditEventView extends AbstractStatefulView {
   }
 
   static parseStateToEvent(state) {
-    const event = { ...state }
+    const event = { ...state };
 
     delete event.isDisabled;
     delete event.isSaving;

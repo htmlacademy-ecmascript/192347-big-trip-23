@@ -1,10 +1,7 @@
 import EventModel from './model/event-model.js';
 import FilterModel from './model/filter-model.js';
 import EventApiService from './event-api-service.js';
-
-import { render, RenderPosition } from './framework/render.js';
 import { AUTHORIZATION, END_POINT } from './const.js';
-
 import FilterPresenter from './presenter/filter-presenter.js';
 import HeaderPresenter from './presenter/header-presenter.js';
 import TripPresenter from './presenter/trip-presenter.js';
@@ -61,7 +58,7 @@ function handleNewEventButtonClick() {
 tripPresenter.init();
 eventModel.init()
   .finally(() => {
-    
+
     headerPresenter.init();
     filterPresenter.init();
   });

@@ -3,7 +3,7 @@ import { render, replace, remove } from '../framework/render.js';
 import { FilterTypes, UpdateType } from '../const';
 import { filter } from '../utils.js';
 
-export default class FilterPresenter {
+export default class FilterPresenterPresenter {
   #container = null;
   #filterModel = null;
   #eventModel = null;
@@ -55,6 +55,7 @@ export default class FilterPresenter {
     if (this.#filterModel.filter === FilterTypes) {
       return;
     }
+
     this.#filterModel.setFilter(UpdateType.MAJOR, filterTypes);
   };
 }

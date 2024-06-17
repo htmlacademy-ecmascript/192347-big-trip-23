@@ -3,13 +3,13 @@ import { calculateTotalBasePrice, getFirstAndLastDates, getInfoTitle } from '../
 
 function createTripInfoTemplate(events, destinations) {
 
-  const eventDestinations = events.map(event => {
+  const eventDestinations = events.map((event) => {
     const destinationId = event.destination;
-    const destination = destinations.find(dest => dest.id === destinationId);
+    const destination = destinations.find((dest) => dest.id === destinationId);
     return destination;
   });
-  const names = eventDestinations.map(city => city.name);
-  const datesArray = events.map(event => ({
+  const names = eventDestinations.map((city) => city.name);
+  const datesArray = events.map((event) => ({
     dateFrom: event.dateFrom,
     dateTo: event.dateTo
   }));
@@ -44,6 +44,7 @@ export default class TripInfoView extends AbstractView{
     this.#events = events;
     this.#destinations = destinations;
   }
+
   get template() {
     return createTripInfoTemplate(this.#events, this.#destinations);
   }

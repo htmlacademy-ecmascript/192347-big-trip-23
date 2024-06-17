@@ -47,8 +47,8 @@ const DISABLED_SORT_TYPES = [
 const FilterTypes = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
-  PAST: 'past',
   PRESENT: 'present',
+  PAST: 'past',
 };
 
 const DEFAULT_FILTER_TYPE = FilterTypes[-1];

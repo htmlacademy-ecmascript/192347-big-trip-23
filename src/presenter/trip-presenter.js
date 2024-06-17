@@ -1,13 +1,13 @@
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
-import { remove, render, RenderPosition} from '../framework/render';
+import { remove, render, RenderPosition } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
 import { isEmpty, sortEvents, filter } from '../utils';
 import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
 import LoadingMessageView from '../view/loading-message-view';
-import FailedMessageView from '../view/failed-message-view'; 
+import FailedMessageView from '../view/failed-message-view';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const TimeLimit = {
@@ -29,7 +29,7 @@ export default class TripPresenter {
   #filterType = DEFAULT_FILTER_TYPE;
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
-  #failedMessageComponent = new FailedMessageView(); 
+  #failedMessageComponent = new FailedMessageView();
   #isLoading = true;
   #newEventButtonComponent = null;
   #tripMainElementContainer = null;
@@ -97,14 +97,12 @@ export default class TripPresenter {
 
   #handleNewPointDestroy = () => {
     this.#newEventButtonComponent.element.disabled = false;
-  
+
     if (isEmpty(this.events)) {
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
     }
-  }
-
-  
+  };
 
   #handleSortTypeChange = (nextSortType) => {
     this.#currentSortType = nextSortType;
@@ -139,7 +137,7 @@ export default class TripPresenter {
     render(this.#loadingMessageComponent, this.#container);
   }
 
-  #failedMessageRendering() {  
+  #failedMessageRendering() {
     render(this.#failedMessageComponent, this.#container);
   }
 
@@ -148,7 +146,7 @@ export default class TripPresenter {
   }
 
   #eventsRendering() {
-    if(this.#eventModel.isError) {
+    if (this.#eventModel.isError) {
       this.#failedMessageRendering();
       return;
     }
@@ -198,7 +196,7 @@ export default class TripPresenter {
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventModel.updateEvent(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -206,8 +204,7 @@ export default class TripPresenter {
         this.#newEventPresenter.setSaving();
         try {
           await this.#eventModel.addEvent(updateType, update);
-        } catch(err) {
-          console.log(err);
+        } catch (err) {
           this.#newEventPresenter.setAborting();
         }
         break;
@@ -215,8 +212,7 @@ export default class TripPresenter {
         this.#eventPresenters.get(update.id).setDeleting();
         try {
           await this.#eventModel.deleteEvent(updateType, update);
-        } catch(err) {
-          console.log(err);
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;

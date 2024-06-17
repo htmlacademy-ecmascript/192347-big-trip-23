@@ -5,11 +5,11 @@ dayjs.extend(duration);
 
 function calculateTotalBasePrice(events) {
   return events.reduce((total, event) => total + event.basePrice, 0);
-};
+}
 
 function getFirstAndLastDates(datesArray) {
   if (datesArray.length === 0) {
-      return ' ';
+    return ' ';
   } else {
     const firstDateFrom = formatDate(datesArray[0].dateFrom, DateFormat.DATE_MONTH);
     const lastDateTo = formatDate(datesArray[datesArray.length - 1].dateTo, DateFormat.DATE_MONTH);
@@ -18,11 +18,11 @@ function getFirstAndLastDates(datesArray) {
     const lastDateMonth = dayjs(datesArray[datesArray.length - 1].dateTo).format('MMM');
 
     if (firstDateMonth === lastDateMonth) {
-        const firstDateDay = dayjs(datesArray[0].dateFrom).format('DD');
-        const lastDateDay = dayjs(datesArray[datesArray.length - 1].dateTo).format('DD');
-        return `${firstDateDay} - ${lastDateDay} ${firstDateMonth}`;
+      const firstDateDay = dayjs(datesArray[0].dateFrom).format('DD');
+      const lastDateDay = dayjs(datesArray[datesArray.length - 1].dateTo).format('DD');
+      return `${firstDateDay} - ${lastDateDay} ${firstDateMonth}`;
     } else {
-        return `${firstDateFrom} - ${lastDateTo}`;
+      return `${firstDateFrom} - ${lastDateTo}`;
     }
   }
 }
@@ -109,9 +109,9 @@ function getFilteredSelectedOffers(event, typeOffers, updatedOffers = []) {
 
 const getInteger = (input) => {
 
- const parsedNumber = Number(input.replace(/\D/g, ''));
- return isNaN(parsedNumber) ? 0 : parsedNumber;
-  
+  const parsedNumber = Number(input.replace(/\D/g, ''));
+  return isNaN(parsedNumber) ? 0 : parsedNumber;
+
 };
 
 export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents, sortEventsBy, filter, getFilteredSelectedOffers, getInteger, getInfoTitle, getFirstAndLastDates, calculateTotalBasePrice };

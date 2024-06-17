@@ -67,7 +67,7 @@ export default class EventPresenter {
 
   setAborting() {
     if (this.#mode === Mode.DEFAULT) {
-      this.#editEventView.shake();
+      this.#eventItemView.shake();
       return;
     }
 
