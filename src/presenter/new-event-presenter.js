@@ -3,16 +3,12 @@ import EditEventView from '../view/event-edit-view.js';
 import { UserAction, UpdateType, EVENT_TYPES, getDefaultEvent } from '../const.js';
 
 export default class NewEventPresenter {
-
   #container = null;
   #handleTripEventChange = null;
   #handleDestroy = null;
   #eventModel = null;
-
   #event = {};
-
   #eventTypes = EVENT_TYPES;
-
   #eventEditComponent = null;
 
   constructor({ container, onDataChange, onNewEventDestroy, eventModel }) {
@@ -38,6 +34,7 @@ export default class NewEventPresenter {
       destinations,
       onFormSubmit: this.#handleFormSubmit,
       onFormDelete: this.#handleEventDeleteClick,
+      onCancelClick: this.#handleEventDeleteClick // Добавил обработчик для кнопки Cancel
     });
 
     render(this.#eventEditComponent, this.#container, RenderPosition.AFTERBEGIN);
@@ -50,7 +47,7 @@ export default class NewEventPresenter {
       return;
     }
     
-    this.#handleDestroy();
+    this.#handleDestroy(); // Переместил вызов сюда, чтобы убедиться, что он выполняется при уничтожении
 
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
@@ -77,7 +74,6 @@ export default class NewEventPresenter {
   }
 
   #handleFormSubmit = (event) => {
-
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,

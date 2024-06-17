@@ -3,7 +3,7 @@ import { render, replace, remove } from '../framework/render.js';
 import { FilterTypes, UpdateType } from '../const';
 import { filter } from '../utils.js';
 
-export default class FilterPresenterPresenter {
+export default class FilterPresenter {
   #container = null;
   #filterModel = null;
   #eventModel = null;

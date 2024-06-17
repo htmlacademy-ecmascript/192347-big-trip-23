@@ -1,6 +1,6 @@
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
-import { remove, render } from '../framework/render';
+import { remove, render, RenderPosition} from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
 import { isEmpty, sortEvents, filter } from '../utils';
 import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
@@ -30,6 +30,8 @@ export default class TripPresenter {
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
   #isLoading = true;
+  #newEventButtonComponent = null;
+  #tripMainElementContainer = null;
   #isError = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -37,12 +39,14 @@ export default class TripPresenter {
   });
 
 
-  constructor({ container, eventModel, filterModel, onNewEventDestroy }) {
+  constructor({ container, eventModel, filterModel, onNewEventDestroy, newEventButtonComponent, tripMainElementContainer }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
-    // this.#handleNewPointDestroy = onNewEventDestroy;
+    this.#newEventButtonComponent = newEventButtonComponent;
+    this.#handleNewPointDestroy = onNewEventDestroy;
+    this.#tripMainElementContainer = tripMainElementContainer;
 
 
     this.#newEventPresenter = new NewEventPresenter({
@@ -92,15 +96,15 @@ export default class TripPresenter {
   }
 
   #handleNewPointDestroy = () => {
-    const newButton = document.querySelector('.trip-main__event-add-btn');
-
+    this.#newEventButtonComponent.element.disabled = false;
     if (isEmpty(this.events) && this.#isLoading !== true) {
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
-      newButton.removeAttribute('disabled');
       return;
     }
   }
+
+  
 
   #handleSortTypeChange = (nextSortType) => {
     this.#currentSortType = nextSortType;
@@ -135,8 +139,13 @@ export default class TripPresenter {
     render(this.#loadingMessageComponent, this.#container);
   }
 
+  #newEventButtonRendering() {
+    render(this.#newEventButtonComponent, this.#tripMainElementContainer, RenderPosition.BEFOREEND);
+  }
+
   #eventsRendering() {
     if (isEmpty(this.events) && this.#isLoading !== true) {
+      this.#newEventButtonRendering();
 
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
@@ -156,6 +165,7 @@ export default class TripPresenter {
 
     render(this.#sortView, this.#container);
     render(this.#eventListComponent, this.#container);
+    this.#newEventButtonRendering();
 
     this.events.forEach((event) => {
       const eventPresenter = new EventPresenter({
