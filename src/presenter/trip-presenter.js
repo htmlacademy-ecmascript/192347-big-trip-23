@@ -1,13 +1,19 @@
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
-import { remove, render } from '../framework/render';
+import { remove, render, RenderPosition } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
 import { isEmpty, sortEvents, filter } from '../utils';
 import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
 import LoadingMessageView from '../view/loading-message-view';
+import FailedMessageView from '../view/failed-message-view';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class TripPresenter {
   #container = null;
@@ -20,25 +26,30 @@ export default class TripPresenter {
   #sortView = null;
   #emptyListView = null;
   #filterType = DEFAULT_FILTER_TYPE;
-  #handleNewPointDestroy = null;
   #activePresenter = null;
   #loadingMessageComponent = new LoadingMessageView();
+  #failedMessageComponent = new FailedMessageView();
   #isLoading = true;
+  #newEventButtonComponent = null;
+  #tripMainElementContainer = null;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT,
+  });
 
-
-  constructor({ container, eventModel, filterModel, onNewEventDestroy }) {
+  constructor({ container, eventModel, filterModel, newEventButtonComponent, tripMainElementContainer }) {
     this.#container = container;
     this.#eventModel = eventModel;
     this.#filterModel = filterModel;
     this.#eventListComponent = new EventListView();
-    this.#handleNewPointDestroy = onNewEventDestroy;
-
+    this.#newEventButtonComponent = newEventButtonComponent;
+    this.#tripMainElementContainer = tripMainElementContainer;
 
     this.#newEventPresenter = new NewEventPresenter({
       eventModel: this.#eventModel,
       container: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
-      onEventDestroy: this.#handleNewPointDestroy,
+      onNewEventDestroy: this.#handleNewPointDestroy,
     });
 
     this.#eventModel.addObserver(this.#handleModelEvent);
@@ -48,6 +59,7 @@ export default class TripPresenter {
   get events() {
     this.#filterType = this.#filterModel.filter;
     const events = this.#eventModel.events;
+
     const filteredEvents = filter[this.#filterType](events);
     const sortedEvents = sortEvents(filteredEvents, this.#currentSortType);
     return sortedEvents;
@@ -66,25 +78,48 @@ export default class TripPresenter {
       this.#activePresenter.destroy();
     }
 
+    remove(this.#emptyListView);
+    this.#emptyListView = null;
+    render(this.#eventListComponent, this.#container);
+
+    if (this.#newEventPresenter !== null) {
+      remove(this.#emptyListView);
+    }
+
     this.#newEventPresenter.init();
     this.#activePresenter = this.#newEventPresenter;
+
   }
+
+  #handleNewPointDestroy = () => {
+    this.#newEventButtonComponent.element.disabled = false;
+
+    if (isEmpty(this.events)) {
+      this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
+      render(this.#emptyListView, this.#container);
+    }
+  };
 
   #handleSortTypeChange = (nextSortType) => {
     this.#currentSortType = nextSortType;
     this.init();
   };
 
-  #clearEventList() {
+  #clearEventList(resetSortType = false) {
     remove(this.#emptyListView);
     this.#emptyListView = null;
+
+    this.#newEventPresenter.destroy();
 
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
     remove(this.#sortView);
-
     this.#sortView = null;
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   }
 
   #handleModeChange = () => {
@@ -103,8 +138,21 @@ export default class TripPresenter {
     render(this.#loadingMessageComponent, this.#container);
   }
 
+  #failedMessageRendering() {
+    render(this.#failedMessageComponent, this.#container);
+  }
+
+  #newEventButtonRendering() {
+    render(this.#newEventButtonComponent, this.#tripMainElementContainer, RenderPosition.BEFOREEND);
+  }
+
   #eventsRendering() {
-    if (isEmpty(this.events) && this.#isLoading !== true) {
+    if (this.#eventModel.isError) {
+      this.#failedMessageRendering();
+      return;
+    }
+    if (isEmpty(this.events) && this.#isLoading !== true && !this.#eventModel.isError) {
+      this.#newEventButtonRendering();
 
       this.#emptyListView = new EmptyListView({ filterType: this.#filterType });
       render(this.#emptyListView, this.#container);
@@ -124,6 +172,7 @@ export default class TripPresenter {
 
     render(this.#sortView, this.#container);
     render(this.#eventListComponent, this.#container);
+    this.#newEventButtonRendering();
 
     this.events.forEach((event) => {
       const eventPresenter = new EventPresenter({
@@ -139,19 +188,36 @@ export default class TripPresenter {
     });
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
 
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this.#eventModel.updateEvent(updateType, update);
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventModel.updateEvent(updateType, update);
+        } catch (err) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_EVENT:
-        this.#eventModel.addEvent(updateType, update);
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventModel.addEvent(updateType, update);
+        } catch (err) {
+          this.#newEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_EVENT:
-        this.#eventModel.deleteEvent(updateType, update);
+        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventModel.deleteEvent(updateType, update);
+        } catch (err) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -164,7 +230,7 @@ export default class TripPresenter {
         this.#eventsRendering();
         break;
       case UpdateType.MAJOR:
-        this.#clearEventList();
+        this.#clearEventList(true);
         this.#eventsRendering();
         break;
       case UpdateType.INIT:

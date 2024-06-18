@@ -7,6 +7,7 @@ export default class EventModel extends Observable {
   #destinations = [];
   #offers = [];
   #sortTypes = Object.values(SortType);
+  isError = false;
 
   constructor({eventApiService}) {
     super();
@@ -29,6 +30,7 @@ export default class EventModel extends Observable {
       this.#events = [];
       this.#destinations = [];
       this.#offers = [];
+      this.isError = true;
     }
     this._notify(UpdateType.INIT);
   }
@@ -69,28 +71,39 @@ export default class EventModel extends Observable {
 
   }
 
-  addEvent(updateType, update) {
-    this.#events = [
-      update,
-      ...this.#events,
-    ];
+  async addEvent(updateType, update) {
+    try {
+      const response = await this.#eventApiService.addEvent(update);
+      const addEvent = this.#adaptToClient(response);
+      this.#events = [
+        addEvent,
+        ...this.#events,
+      ];
 
+      this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t add event');
+    }
     this._notify(updateType, update);
   }
 
-  deleteEvent(updateType, update) {
+  async deleteEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting event');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1),
-    ];
-
-    this._notify(updateType);
+    try {
+      await this.#eventApiService.deleteEvent(update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        ...this.#events.slice(index + 1),
+      ];
+      this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete event');
+    }
   }
 
   #adaptToClient(event) {

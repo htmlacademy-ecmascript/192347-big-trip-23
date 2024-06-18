@@ -14,6 +14,7 @@ function createEventTemplate(event, offers, destinations, updatedOffers) {
   const dateTimeAttributeTo = formatDate(dateTo, DateFormat.ATTRIBUTE_DATE_TIME);
   const eventDuration = countDuration(dateFrom, event.dateTo);
 
+
   return (
     `
     <li class="trip-events__item">

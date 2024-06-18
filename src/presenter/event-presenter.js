@@ -7,7 +7,6 @@ export default class EventPresenter {
   #container = null;
   #eventModel = null;
   #event = null;
-  #updatedOffers = [];
 
   #eventItemView = null;
   #editEventView = null;
@@ -34,9 +33,6 @@ export default class EventPresenter {
     remove(this.#eventItemView);
     remove(this.#editEventView);
 
-    this.#eventItemView = null;
-    this.#editEventView = null;
-
     document.removeEventListener('keydown', this.#onEscKeydown);
   }
 
@@ -46,6 +42,41 @@ export default class EventPresenter {
     }
     this.#editEventView.reset(this.#event);
     this.#switchToViewMode();
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDIT) {
+      this.#editEventView.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDIT) {
+      this.#editEventView.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventItemView.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editEventView.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editEventView.shake(resetFormState);
   }
 
   #renderEventItemView(event) {

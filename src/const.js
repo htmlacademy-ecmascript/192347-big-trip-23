@@ -1,5 +1,6 @@
-const AUTHORIZATION = 'Basic Gmsgv4iwthasaspsbl';
+const AUTHORIZATION = 'Basic msgviwhadaswsasbl';
 const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
+
 
 const EVENT_TYPES = [
   'taxi',
@@ -20,10 +21,9 @@ const DatepickerConfig = {
 };
 
 const getDefaultEvent = () => ({
-  id: '',
   basePrice: 0,
-  dateFrom: '2024-06-02T20:08:08.363Z',
-  dateTo: '2024-06-03T07:18:08.363Z',
+  dateFrom: '',
+  dateTo: '',
   destination: 0,
   isFavorite: false,
   offers: [],
@@ -46,8 +46,8 @@ const DISABLED_SORT_TYPES = [
 const FilterTypes = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
-  PAST: 'past',
   PRESENT: 'present',
+  PAST: 'past',
 };
 
 const DEFAULT_FILTER_TYPE = FilterTypes[-1];
@@ -60,6 +60,7 @@ const EventEmptyListMessages = {
 };
 
 const DateFormat = {
+  DATE_MONTH: 'DD MMM',
   DATE: 'MMM DD',
   TIME: 'HH:mm',
   ATTRIBUTE_DATE_TIME: 'YYYY-MM-DDTHH:mm',
