@@ -9,30 +9,23 @@ import 'flatpickr/dist/themes/material_blue.css';
 
 function editEventTemplate(event, destinations, offers) {
   const { basePrice, dateFrom, dateTo, type, isDisabled, isSaving, isDeleting } = event;
-  const eventId = event.id;
 
+  function getDeleteButtonText(currentEventId, statusEvent) {
+    if (!currentEventId) {
+      return 'Cancel';
+    }
+    return statusEvent ? 'Deleting...' : 'Delete';
+  }
+
+  const eventId = event.id;
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
-
   const totalPrice = basePrice + filteredSelectedOffers.reduce((sum, currentOffer) => sum + currentOffer.price, 0);
-
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
-  console.log(currentDestination);
-
-
-
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
-
-function getDeleteButtonText(currentEventId, statusEvent) {
-  if (!currentEventId) {
-    return 'Cancel';
-  }
-  return statusEvent ? 'Deleting...' : 'Delete';
-};
-const deleteButtonText = getDeleteButtonText(eventId, isDeleting)
-
+  const deleteButtonText = getDeleteButtonText(eventId, isDeleting);
 
   return (
     `
@@ -117,18 +110,18 @@ const deleteButtonText = getDeleteButtonText(eventId, isDeleting)
       </section>`
       : ''}
       ${currentDestination && description ? (
-        `<section class="event__section  event__section--destination">
+      `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${description}</p>
       ${pictures.length ? (
-          `<div class="event__photos-container">
+        `<div class="event__photos-container">
           <div class="event__photos-tape">
             ${pictures.map((pic) => `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`)}
           </div>
         </div>`
-        ) : ''}
-      </section>`
       ) : ''}
+      </section>`
+    ) : ''}
       </section>
     </form>
   </li>`

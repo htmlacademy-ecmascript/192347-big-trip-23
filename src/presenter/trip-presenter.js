@@ -78,10 +78,6 @@ export default class TripPresenter {
       this.#activePresenter.destroy();
     }
 
-    // if (!this.#eventListComponent.element.parentElement) {
-    //   render(this.#eventListComponent, this.#container);
-    // }
-
     remove(this.#emptyListView);
     this.#emptyListView = null;
     render(this.#eventListComponent, this.#container);

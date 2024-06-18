@@ -22,11 +22,6 @@ export default class NewButtonView extends AbstractView {
     return createNewEventButtonTemplate();
   }
 
-  #onNewEventButtonClick = (evt) => {
-    evt.preventDefault();
-    this.#handleButtonClick();
-  };
-
   disable() {
     this.element.disabled = true;
   }
@@ -34,4 +29,9 @@ export default class NewButtonView extends AbstractView {
   enable() {
     this.element.disabled = false;
   }
+
+  #onNewEventButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#handleButtonClick();
+  };
 }

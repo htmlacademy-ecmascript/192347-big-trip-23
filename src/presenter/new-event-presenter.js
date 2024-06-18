@@ -78,7 +78,6 @@ export default class NewEventPresenter {
       UpdateType.MAJOR,
       event,
     );
-    // this.destroy();
   };
 
   #handleEventDeleteClick = () => {

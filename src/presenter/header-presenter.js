@@ -26,7 +26,6 @@ export default class HeaderPresenter {
   init() {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;
-    console.log(offers);
 
     this.#tripInfoComponent = new TripInfoView({
       events: this.events,

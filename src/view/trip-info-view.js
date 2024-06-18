@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {getFirstAndLastDates, getInfoTitle, getEventsTotalPrice } from '../utils.js';
+import { getFirstAndLastDates, getInfoTitle, getEventsTotalPrice } from '../utils.js';
 
 function createTripInfoTemplate(events, destinations, offers) {
 
@@ -18,40 +18,37 @@ function createTripInfoTemplate(events, destinations, offers) {
   const tripInfoTitle = getInfoTitle(names);
   const sumOfTotalPrices = getEventsTotalPrice(events, offers);
 
-  function getTripInfoContent(events, tripInfoTitle, firstAndLastDates, sumOfTotalPrices) {
-    if (events.length === 0) {
+  function getTripInfoContent(eventList, title, dates, totalPrice) {
+    if (eventList.length === 0) {
       return '';
     }
-  
+
     return `
       <div class="trip-info__main">
-        <h1 class="trip-info__title">${tripInfoTitle}</h1>
-        <p class="trip-info__dates">${firstAndLastDates}</p>
+        <h1 class="trip-info__title">${title}</h1>
+        <p class="trip-info__dates">${dates}</p>
       </div>
       <p class="trip-info__cost">
-        Total: €&nbsp;<span class="trip-info__cost-value">${sumOfTotalPrices}</span>
+        Total: €&nbsp;<span class="trip-info__cost-value">${totalPrice}</span>
       </p>
     `;
   }
 
   const tripInfoContent = getTripInfoContent(events, tripInfoTitle, firstAndLastDates, sumOfTotalPrices);
 
-return (
-  `
-  <section class="trip-main__trip-info  trip-info">
-    ${tripInfoContent}
-  </section>
-  `
-);
-
+  return `
+    <section class="trip-main__trip-info trip-info">
+      ${tripInfoContent}
+    </section>
+  `;
 }
 
-export default class TripInfoView extends AbstractView{
+export default class TripInfoView extends AbstractView {
   #events = null;
   #destinations = null;
   #offers = null;
 
-  constructor({ events, destinations, offers}) {
+  constructor({ events, destinations, offers }) {
     super();
     this.#events = events;
     this.#destinations = destinations;

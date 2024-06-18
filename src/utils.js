@@ -6,16 +6,16 @@ dayjs.extend(duration);
 function getEventsTotalPrice(events, offers) {
 
   const offerPriceMap = offers.reduce((acc, offerGroup) => {
-      offerGroup.offers.forEach(offer => {
-          acc[offer.id] = offer.price;
-      });
-      return acc;
+    offerGroup.offers.forEach((offer) => {
+      acc[offer.id] = offer.price;
+    });
+    return acc;
   }, {});
 
-  const eventsTotalPrice = events.map(event => {
-      const offerPrices = event.offers.map(offerId => offerPriceMap[offerId] || 0);
-      const totalPrice = event.basePrice + offerPrices.reduce((acc, price) => acc + price, 0);
-      return totalPrice;
+  const eventsTotalPrice = events.map((event) => {
+    const offerPrices = event.offers.map((offerId) => offerPriceMap[offerId] || 0);
+    const totalPrice = event.basePrice + offerPrices.reduce((acc, price) => acc + price, 0);
+    return totalPrice;
   });
 
   return eventsTotalPrice.reduce((acc, price) => acc + price, 0);
@@ -87,9 +87,6 @@ function capitalizeFirstLetter(str) {
 
 const isEmpty = (list) => list.length === 0;
 
-const updateData = (data, update) => data.map((item) => item.id === update.id ? update : item);
-const updateItem = (item, prop) => ({ ...item, ...prop });
-
 const now = dayjs();
 
 const filter = {
@@ -115,4 +112,18 @@ const getInteger = (input) => {
 
 };
 
-export { DateFormat, formatDate, countDuration, capitalizeFirstLetter, isEmpty, updateData, updateItem, sortEvents, sortEventsBy, filter, getFilteredSelectedOffers, getInteger, getInfoTitle, getFirstAndLastDates, getEventsTotalPrice };
+export {
+  DateFormat,
+  formatDate,
+  countDuration,
+  capitalizeFirstLetter,
+  isEmpty,
+  sortEvents,
+  sortEventsBy,
+  filter,
+  getFilteredSelectedOffers,
+  getInteger,
+  getInfoTitle,
+  getFirstAndLastDates,
+  getEventsTotalPrice
+};
