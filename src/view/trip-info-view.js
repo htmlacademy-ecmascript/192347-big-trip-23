@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { calculateTotalBasePrice, getFirstAndLastDates, getInfoTitle } from '../utils.js';
+import {getFirstAndLastDates, getInfoTitle, getEventsTotalPrice } from '../utils.js';
 
-function createTripInfoTemplate(events, destinations) {
+function createTripInfoTemplate(events, destinations, offers) {
 
   const eventDestinations = events.map((event) => {
     const destinationId = event.destination;
@@ -16,36 +16,49 @@ function createTripInfoTemplate(events, destinations) {
 
   const firstAndLastDates = getFirstAndLastDates(datesArray);
   const tripInfoTitle = getInfoTitle(names);
-  const totalBasePrice = calculateTotalBasePrice(events);
+  const sumOfTotalPrices = getEventsTotalPrice(events, offers);
 
-  return (
-    `
-    <section class="trip-main__trip-info  trip-info">
-    <div class="trip-info__main">
-      <h1 class="trip-info__title">${tripInfoTitle}</h1>
+  function getTripInfoContent(events, tripInfoTitle, firstAndLastDates, sumOfTotalPrices) {
+    if (events.length === 0) {
+      return '';
+    }
+  
+    return `
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">${tripInfoTitle}</h1>
+        <p class="trip-info__dates">${firstAndLastDates}</p>
+      </div>
+      <p class="trip-info__cost">
+        Total: €&nbsp;<span class="trip-info__cost-value">${sumOfTotalPrices}</span>
+      </p>
+    `;
+  }
 
-      <p class="trip-info__dates">${firstAndLastDates}</p>
-    </div>
+  const tripInfoContent = getTripInfoContent(events, tripInfoTitle, firstAndLastDates, sumOfTotalPrices);
 
-    <p class="trip-info__cost">
-      Total: €&nbsp;<span class="trip-info__cost-value">${totalBasePrice}</span>
-    </p>
+return (
+  `
+  <section class="trip-main__trip-info  trip-info">
+    ${tripInfoContent}
   </section>
   `
-  );
+);
+
 }
 
 export default class TripInfoView extends AbstractView{
   #events = null;
   #destinations = null;
+  #offers = null;
 
-  constructor({ events, destinations}) {
+  constructor({ events, destinations, offers}) {
     super();
     this.#events = events;
     this.#destinations = destinations;
+    this.#offers = offers;
   }
 
   get template() {
-    return createTripInfoTemplate(this.#events, this.#destinations);
+    return createTripInfoTemplate(this.#events, this.#destinations, this.#offers);
   }
 }

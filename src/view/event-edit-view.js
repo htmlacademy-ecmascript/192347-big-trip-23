@@ -18,11 +18,21 @@ function editEventTemplate(event, destinations, offers) {
 
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
+  console.log(currentDestination);
+
+
 
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
   const dateTimeEditFrom = formatDate(dateFrom, DateFormat.EDIT_DATE_TIME);
 
-  const deleteButtonText = eventId ? (isDeleting ? 'Deleting...' : 'Delete') : 'Cancel';
+function getDeleteButtonText(currentEventId, statusEvent) {
+  if (!currentEventId) {
+    return 'Cancel';
+  }
+  return statusEvent ? 'Deleting...' : 'Delete';
+};
+const deleteButtonText = getDeleteButtonText(eventId, isDeleting)
+
 
   return (
     `
@@ -62,11 +72,11 @@ function editEventTemplate(event, destinations, offers) {
         </div>
 
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-${eventId}">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-${eventId}" type="text" name="event-start-time" value="${dateTimeEditFrom}">
+          <label class="visually-hidden" for="event-start-time-1">From</label>
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateTimeEditFrom}">
           —
-          <label class="visually-hidden" for="event-end-time-${eventId}">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-${eventId}" type="text" name="event-end-time" value="${dateTimeEditTo}">
+          <label class="visually-hidden" for="event-end-time-1">To</label>
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTimeEditTo}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -74,11 +84,11 @@ function editEventTemplate(event, destinations, offers) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" name="event-price" value="${totalPrice}" min="1" max="100000">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${totalPrice}" min="1" max="100000">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
-        <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+        <button class="event__reset-btn" type="reset">
         ${deleteButtonText}</button>
         ${eventId ? (
       `<button class="event__rollup-btn" type="button">
@@ -106,19 +116,19 @@ function editEventTemplate(event, destinations, offers) {
       </div>
       </section>`
       : ''}
-    ${currentDestination ? (
-      `<section class="event__section  event__section--destination">
-      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${description}</p>
-    ${pictures.length ? (
-        `<div class="event__photos-container">
-        <div class="event__photos-tape">
-          ${pictures.map((pic) => `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`)}
-        </div>
-      </div>`
+      ${currentDestination && description ? (
+        `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${description}</p>
+      ${pictures.length ? (
+          `<div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${pictures.map((pic) => `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`)}
+          </div>
+        </div>`
+        ) : ''}
+      </section>`
       ) : ''}
-    </section>`
-    ) : ''}
       </section>
     </form>
   </li>`
@@ -243,17 +253,22 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
   #setDatepickers() {
-    this.#datepickerStart = flatpickr(this.element.querySelector('[name="event-start-time"]'),
+    this.#setDatePickerFrom();
+    this.#setDatePickerEnd();
+  }
+
+  #setDatePickerFrom() {
+    this.#datepickerStart = flatpickr(this.element.querySelector('#event-start-time-1'),
       {
         ...DatepickerConfig,
         defaultDate: this._state.dateFrom,
-        // minDate: this._state.dateFrom,
-
         onChange: this.#onDateStartChange,
       },
     );
+  }
 
-    this.#datepickerEnd = flatpickr(this.element.querySelector('[name="event-end-time"]'),
+  #setDatePickerEnd() {
+    this.#datepickerEnd = flatpickr(this.element.querySelector('#event-end-time-1'),
       {
         ...DatepickerConfig,
         defaultDate: this._state.dateTo,
@@ -264,30 +279,12 @@ export default class EditEventView extends AbstractStatefulView {
   }
 
   #onDateStartChange = ([userDate]) => {
-    const currentEndDate = this._state.dateTo instanceof Date ? this._state.dateTo : new Date(this._state.dateTo);
-    const newDateEnd = new Date(userDate.getTime() + 60000); // +1 минута
-
-    // Проверка и сравнение дат
-    if (userDate >= currentEndDate) {
-      this.updateElement({
-        dateFrom: userDate,
-        dateTo: newDateEnd
-      });
-
-      this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
-      this.#datepickerEnd.setDate(newDateEnd, false); // Устанавливает новую дату окончания, не вызывая событие изменения
-    } else {
-      this.updateElement({
-        dateFrom: userDate
-      });
-
-      this.#datepickerEnd.set('minDate', userDate); // Обновляет minDate для end datepicker
-    }
+    this._setState({ dateFrom: userDate });
+    this.#setDatePickerEnd();
   };
 
-
   #onDateEndChange = ([userDate]) => {
-    this.updateElement({
+    this._setState({
       dateTo: userDate,
     });
   };

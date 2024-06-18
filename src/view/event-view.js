@@ -14,8 +14,6 @@ function createEventTemplate(event, offers, destinations, updatedOffers) {
   const dateTimeAttributeTo = formatDate(dateTo, DateFormat.ATTRIBUTE_DATE_TIME);
   const eventDuration = countDuration(dateFrom, event.dateTo);
 
-  const total = filteredSelectedOffers.reduce((sum, currentOffer) => sum + currentOffer.price, 0) + basePrice;
-
 
   return (
     `
@@ -35,7 +33,7 @@ function createEventTemplate(event, offers, destinations, updatedOffers) {
                   <p class="event__duration">${eventDuration}</p>
                 </div>
                 <p class="event__price">
-                  &euro;&nbsp;<span class="event__price-value">${total}</span>
+                  &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">

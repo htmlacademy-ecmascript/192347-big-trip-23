@@ -15,7 +15,6 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-
 export default class TripPresenter {
   #container = null;
   #eventModel = null;
@@ -33,12 +32,10 @@ export default class TripPresenter {
   #isLoading = true;
   #newEventButtonComponent = null;
   #tripMainElementContainer = null;
-  // #isError = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
-    upperLimit: TimeLimit.UPPER_LIMIT
+    upperLimit: TimeLimit.UPPER_LIMIT,
   });
-
 
   constructor({ container, eventModel, filterModel, newEventButtonComponent, tripMainElementContainer }) {
     this.#container = container;
@@ -47,7 +44,6 @@ export default class TripPresenter {
     this.#eventListComponent = new EventListView();
     this.#newEventButtonComponent = newEventButtonComponent;
     this.#tripMainElementContainer = tripMainElementContainer;
-
 
     this.#newEventPresenter = new NewEventPresenter({
       eventModel: this.#eventModel,
@@ -70,7 +66,6 @@ export default class TripPresenter {
   }
 
   init() {
-
     this.#clearEventList();
     this.#eventsRendering();
   }
@@ -83,9 +78,13 @@ export default class TripPresenter {
       this.#activePresenter.destroy();
     }
 
-    if (!this.#eventListComponent.element.parentElement) {
-      render(this.#eventListComponent, this.#container);
-    }
+    // if (!this.#eventListComponent.element.parentElement) {
+    //   render(this.#eventListComponent, this.#container);
+    // }
+
+    remove(this.#emptyListView);
+    this.#emptyListView = null;
+    render(this.#eventListComponent, this.#container);
 
     if (this.#newEventPresenter !== null) {
       remove(this.#emptyListView);
@@ -93,6 +92,7 @@ export default class TripPresenter {
 
     this.#newEventPresenter.init();
     this.#activePresenter = this.#newEventPresenter;
+
   }
 
   #handleNewPointDestroy = () => {
@@ -109,7 +109,7 @@ export default class TripPresenter {
     this.init();
   };
 
-  #clearEventList() {
+  #clearEventList(resetSortType = false) {
     remove(this.#emptyListView);
     this.#emptyListView = null;
 
@@ -117,8 +117,11 @@ export default class TripPresenter {
     this.#eventPresenters.clear();
 
     remove(this.#sortView);
-
     this.#sortView = null;
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   }
 
   #handleModeChange = () => {
@@ -188,7 +191,6 @@ export default class TripPresenter {
   }
 
   #handleViewAction = async (actionType, updateType, update) => {
-
     this.#uiBlocker.block();
 
     switch (actionType) {
@@ -230,7 +232,7 @@ export default class TripPresenter {
         this.#eventsRendering();
         break;
       case UpdateType.MAJOR:
-        this.#clearEventList();
+        this.#clearEventList(true);
         this.#eventsRendering();
         break;
       case UpdateType.INIT:

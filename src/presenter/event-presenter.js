@@ -33,8 +33,8 @@ export default class EventPresenter {
     remove(this.#eventItemView);
     remove(this.#editEventView);
 
-    this.#eventItemView = null;
-    this.#editEventView = null;
+    // this.#eventItemView = null;
+    // this.#editEventView = null;
 
     document.removeEventListener('keydown', this.#onEscKeydown);
   }

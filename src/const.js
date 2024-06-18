@@ -1,4 +1,4 @@
-const AUTHORIZATION = 'Basic msgviwhasasdf56bl';
+const AUTHORIZATION = 'Basic msgviwhadaswsasbl';
 const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
 
 
@@ -21,10 +21,9 @@ const DatepickerConfig = {
 };
 
 const getDefaultEvent = () => ({
-
-  basePrice: Number(0),
-  dateFrom: new Date(),
-  dateTo: new Date(new Date().valueOf() + 60000),
+  basePrice: 0,
+  dateFrom: '',
+  dateTo: '',
   destination: 0,
   isFavorite: false,
   offers: [],

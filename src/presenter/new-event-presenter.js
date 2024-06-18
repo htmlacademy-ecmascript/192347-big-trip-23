@@ -75,10 +75,10 @@ export default class NewEventPresenter {
   #handleFormSubmit = (event) => {
     this.#handleTripEventChange(
       UserAction.ADD_EVENT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       event,
     );
-    this.destroy();
+    // this.destroy();
   };
 
   #handleEventDeleteClick = () => {
