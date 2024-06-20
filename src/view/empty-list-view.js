@@ -1,8 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { EventEmptyListMessages } from '../const.js';
+import { EventEmptyListMessage } from '../const.js';
 
 function createListEmptyTemplate(filterTypes) {
-  const tripEventsMessage = EventEmptyListMessages[filterTypes];
+  const tripEventsMessage = EventEmptyListMessage[filterTypes];
 
   return (
     `<p class="trip-events__msg">${tripEventsMessage}</p>`

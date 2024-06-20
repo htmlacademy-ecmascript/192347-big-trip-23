@@ -1,6 +1,6 @@
 import EventView from '../view/event-view';
 import { render, replace, remove } from '../framework/render';
-import EditEventView from '../view/event-edit-view';
+import EventEditView from '../view/event-edit-view';
 import { Mode, UpdateType, UserAction } from '../const';
 
 export default class EventPresenter {
@@ -9,7 +9,7 @@ export default class EventPresenter {
   #event = null;
 
   #eventItemView = null;
-  #editEventView = null;
+  #eventEditView = null;
 
   #handleTripEventChange = null;
   #handleEditMode = null;
@@ -31,7 +31,7 @@ export default class EventPresenter {
 
   destroy() {
     remove(this.#eventItemView);
-    remove(this.#editEventView);
+    remove(this.#eventEditView);
 
     document.removeEventListener('keydown', this.#onEscKeydown);
   }
@@ -40,13 +40,13 @@ export default class EventPresenter {
     if (this.#mode === Mode.DEFAULT) {
       return;
     }
-    this.#editEventView.reset(this.#event);
+    this.#eventEditView.reset(this.#event);
     this.#switchToViewMode();
   }
 
   setSaving() {
     if (this.#mode === Mode.EDIT) {
-      this.#editEventView.updateElement({
+      this.#eventEditView.updateElement({
         isDisabled: true,
         isSaving: true,
       });
@@ -55,7 +55,7 @@ export default class EventPresenter {
 
   setDeleting() {
     if (this.#mode === Mode.EDIT) {
-      this.#editEventView.updateElement({
+      this.#eventEditView.updateElement({
         isDisabled: true,
         isDeleting: true,
       });
@@ -69,14 +69,14 @@ export default class EventPresenter {
     }
 
     const resetFormState = () => {
-      this.#editEventView.updateElement({
+      this.#eventEditView.updateElement({
         isDisabled: false,
         isSaving: false,
         isDeleting: false,
       });
     };
 
-    this.#editEventView.shake(resetFormState);
+    this.#eventEditView.shake(resetFormState);
   }
 
   #renderEventItemView(event) {
@@ -98,7 +98,7 @@ export default class EventPresenter {
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
-    this.#editEventView = new EditEventView({
+    this.#eventEditView = new EventEditView({
       event,
       offers,
       destinations,
@@ -116,15 +116,15 @@ export default class EventPresenter {
 
   #switchToEditMode() {
     this.#handleEditMode();
-    replace(this.#editEventView, this.#eventItemView);
+    replace(this.#eventEditView, this.#eventItemView);
 
     document.addEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.EDIT;
   }
 
   #switchToViewMode() {
-    this.#editEventView.reset(this.#event);
-    replace(this.#eventItemView, this.#editEventView);
+    this.#eventEditView.reset(this.#event);
+    replace(this.#eventItemView, this.#eventEditView);
     document.removeEventListener('keydown', this.#onEscKeydown);
     this.#mode = Mode.DEFAULT;
   }
@@ -132,7 +132,7 @@ export default class EventPresenter {
   #onEscKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
-      this.#editEventView.reset(this.#event);
+      this.#eventEditView.reset(this.#event);
       this.#switchToViewMode();
     }
   };

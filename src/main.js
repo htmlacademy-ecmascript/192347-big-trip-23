@@ -5,7 +5,7 @@ import { AUTHORIZATION, END_POINT } from './const.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import HeaderPresenter from './presenter/header-presenter.js';
 import TripPresenter from './presenter/trip-presenter.js';
-import NewButtonView from './view/new-event-button-view.js';
+import NewEventButtonView from './view/new-event-button-view.js';
 
 const pageBodyElement = document.querySelector('.page-body');
 const tripMainElement = pageBodyElement.querySelector('.trip-main');
@@ -17,7 +17,7 @@ const eventModel = new EventModel({
 });
 const filterModel = new FilterModel();
 
-const newEventButtonComponent = new NewButtonView({
+const newEventButtonComponent = new NewEventButtonView({
   onNewButtonClick: handleNewEventButtonClick
 });
 
