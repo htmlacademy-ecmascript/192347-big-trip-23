@@ -1,6 +1,6 @@
 import FilterView from '../view/filter-view';
 import { render, replace, remove } from '../framework/render.js';
-import { FilterTypes, UpdateType } from '../const';
+import { FilterType, UpdateType } from '../const';
 import { filter } from '../utils.js';
 
 export default class FilterPresenterPresenter {
@@ -22,7 +22,7 @@ export default class FilterPresenterPresenter {
   get filters() {
     const events = this.#eventModel.events;
 
-    return Object.values(FilterTypes).map((type) => ({
+    return Object.values(FilterType).map((type) => ({
       type,
       count: filter[type](events).length
     }));
@@ -51,11 +51,11 @@ export default class FilterPresenterPresenter {
     this.init();
   };
 
-  #handleFilterTypeChange = (filterTypes) => {
-    if (this.#filterModel.filter === FilterTypes) {
+  #handleFilterTypeChange = (filters) => {
+    if (this.#filterModel.filter === FilterType) {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterTypes);
+    this.#filterModel.setFilter(UpdateType.MAJOR, filters);
   };
 }

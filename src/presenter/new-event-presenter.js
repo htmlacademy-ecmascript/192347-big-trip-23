@@ -1,5 +1,5 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
-import EditEventView from '../view/event-edit-view.js';
+import EventEditView from '../view/event-edit-view.js';
 import { UserAction, UpdateType, EVENT_TYPES, getDefaultEvent } from '../const.js';
 
 export default class NewEventPresenter {
@@ -27,7 +27,7 @@ export default class NewEventPresenter {
     const destinations = this.#eventModel.destinations;
     const offers = this.#eventModel.offers;
 
-    this.#eventEditComponent = new EditEventView({
+    this.#eventEditComponent = new EventEditView({
       event: this.#event,
       offers,
       eventTypes: this.#eventTypes,

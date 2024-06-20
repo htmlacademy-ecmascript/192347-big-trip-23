@@ -43,20 +43,20 @@ const DISABLED_SORT_TYPES = [
   SortType.OFFERS
 ];
 
-const FilterTypes = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
   PAST: 'past',
 };
 
-const DEFAULT_FILTER_TYPE = FilterTypes[-1];
+const DEFAULT_FILTER_TYPE = FilterType[-1];
 
-const EventEmptyListMessages = {
-  [FilterTypes.EVERYTHING]: 'Click New Event to create your first point',
-  [FilterTypes.PAST]: 'There are no past events now',
-  [FilterTypes.PRESENT]: 'There are no present events now',
-  [FilterTypes.FUTURE]: 'There are no future events now',
+const EventEmptyListMessage = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now',
 };
 
 const DateFormat = {
@@ -94,8 +94,8 @@ export {
   END_POINT,
   EVENT_TYPES,
   getDefaultEvent,
-  FilterTypes,
-  EventEmptyListMessages,
+  FilterType,
+  EventEmptyListMessage,
   DateFormat,
   DEFAULT_FILTER_TYPE,
   Mode,

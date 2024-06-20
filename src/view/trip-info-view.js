@@ -5,16 +5,16 @@ function createTripInfoTemplate(events, destinations, offers) {
 
   const eventDestinations = events.map((event) => {
     const destinationId = event.destination;
-    const destination = destinations.find((dest) => dest.id === destinationId);
+    const destination = destinations.find((destinationItem) => destinationItem.id === destinationId);
     return destination;
   });
   const names = eventDestinations.map((city) => city.name);
-  const datesArray = events.map((event) => ({
+  const eventsDates = events.map((event) => ({
     dateFrom: event.dateFrom,
     dateTo: event.dateTo
   }));
 
-  const firstAndLastDates = getFirstAndLastDates(datesArray);
+  const firstAndLastDates = getFirstAndLastDates(eventsDates);
   const tripInfoTitle = getInfoTitle(names);
   const sumOfTotalPrices = getEventsTotalPrice(events, offers);
 

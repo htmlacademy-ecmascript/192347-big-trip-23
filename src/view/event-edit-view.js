@@ -20,7 +20,7 @@ function editEventTemplate(event, destinations, offers) {
   const eventId = event.id;
   const typeOffers = offers.find((offer) => offer.type === event.type).offers;
   const filteredSelectedOffers = getFilteredSelectedOffers(event, typeOffers);
-  const totalPrice = basePrice + filteredSelectedOffers.reduce((sum, currentOffer) => sum + currentOffer.price, 0);
+
   const currentDestination = destinations.find((destination) => destination.id === event.destination);
   const { name, description, pictures } = currentDestination || {};
   const dateTimeEditTo = formatDate(dateTo, DateFormat.EDIT_DATE_TIME);
@@ -77,7 +77,7 @@ function editEventTemplate(event, destinations, offers) {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${totalPrice}" min="1" max="100000">
+          <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${basePrice}" min="1" max="100000">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -116,7 +116,7 @@ function editEventTemplate(event, destinations, offers) {
       ${pictures.length ? (
         `<div class="event__photos-container">
           <div class="event__photos-tape">
-            ${pictures.map((pic) => `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`)}
+            ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`)}
           </div>
         </div>`
       ) : ''}
@@ -128,7 +128,7 @@ function editEventTemplate(event, destinations, offers) {
   );
 }
 
-export default class EditEventView extends AbstractStatefulView {
+export default class EventEditView extends AbstractStatefulView {
   #destinations = null;
   #offers = null;
   #handleFormSubmit = null;
@@ -140,7 +140,7 @@ export default class EditEventView extends AbstractStatefulView {
 
   constructor({ event, destinations, offers, onFormCancel, onFormSubmit, onFormDelete }) {
     super();
-    this._setState(EditEventView.parseEventToState(event));
+    this._setState(EventEditView.parseEventToState(event));
 
     this.#destinations = destinations;
     this.#offers = offers;
@@ -158,7 +158,7 @@ export default class EditEventView extends AbstractStatefulView {
 
   reset(event) {
     this.updateElement(
-      EditEventView.parseEventToState(event)
+      EventEditView.parseEventToState(event)
     );
   }
 
@@ -232,7 +232,7 @@ export default class EditEventView extends AbstractStatefulView {
 
   #onEventSubmit = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(EditEventView.parseStateToEvent(this._state));
+    this.#handleFormSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
   #onEventCancel = (evt) => {
@@ -242,7 +242,7 @@ export default class EditEventView extends AbstractStatefulView {
 
   #onFormDelete = (evt) => {
     evt.preventDefault();
-    this.#handleEventDeleteClick(EditEventView.parseStateToEvent(this._state));
+    this.#handleEventDeleteClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #setDatepickers() {

@@ -1,24 +1,24 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DateFormat, SortType, FilterTypes } from './const';
+import { DateFormat, SortType, FilterType } from './const';
 dayjs.extend(duration);
 
 function getEventsTotalPrice(events, offers) {
 
-  const offerPriceMap = offers.reduce((acc, offerGroup) => {
+  const offerPriceMap = offers.reduce((offerPrice, offerGroup) => {
     offerGroup.offers.forEach((offer) => {
-      acc[offer.id] = offer.price;
+      offerPrice[offer.id] = offer.price;
     });
-    return acc;
+    return offerPrice;
   }, {});
 
   const eventsTotalPrice = events.map((event) => {
     const offerPrices = event.offers.map((offerId) => offerPriceMap[offerId] || 0);
-    const totalPrice = event.basePrice + offerPrices.reduce((acc, price) => acc + price, 0);
+    const totalPrice = event.basePrice + offerPrices.reduce((accumulatedPrice, offerPrice) => accumulatedPrice + offerPrice, 0);
     return totalPrice;
   });
 
-  return eventsTotalPrice.reduce((acc, price) => acc + price, 0);
+  return eventsTotalPrice.reduce((accumulatedPrice, offerPrice) => accumulatedPrice + offerPrice, 0);
 }
 
 function getFirstAndLastDates(datesArray) {
@@ -51,10 +51,11 @@ function getInfoTitle(names) {
 }
 
 const sortEventsBy = {
-  [SortType.DAY]: (events) => [...events].sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom))),
-  [SortType.TIME]: (events) => [...events].sort((a, b) => getTimeDifference(b.dateFrom, b.dateTo) - getTimeDifference(a.dateFrom, a.dateTo)),
-  [SortType.PRICE]: (events) => [...events].sort((a, b) => b.basePrice - a.basePrice),
+  [SortType.DAY]: (events) => [...events].sort((firstEvent, secondEvent) => dayjs(firstEvent.dateFrom).diff(dayjs(secondEvent.dateFrom))),
+  [SortType.TIME]: (events) => [...events].sort((firstEvent, secondEvent) => getTimeDifference(secondEvent.dateFrom, secondEvent.dateTo) - getTimeDifference(firstEvent.dateFrom, firstEvent.dateTo)),
+  [SortType.PRICE]: (events) => [...events].sort((firstEvent, secondEvent) => secondEvent.basePrice - firstEvent.basePrice),
 };
+
 const sortEvents = (events, sortType) => sortEventsBy[sortType](events);
 
 function getTimeDifference(dateFrom, dateTo) {
@@ -81,8 +82,8 @@ function countDuration(dateFrom, dateTo) {
   return resultParts.join(' ').trim();
 }
 
-function capitalizeFirstLetter(str) {
-  return str.replace(str[0], str[0].toUpperCase());
+function capitalizeFirstLetter(string) {
+  return string.replace(string[0], string[0].toUpperCase());
 }
 
 const isEmpty = (list) => list.length === 0;
@@ -90,14 +91,14 @@ const isEmpty = (list) => list.length === 0;
 const now = dayjs();
 
 const filter = {
-  [FilterTypes.EVERYTHING]: (events) => [...events],
-  [FilterTypes.FUTURE]: (events) => [...events].filter(({ dateFrom }) => dayjs(dateFrom).isAfter(now)),
-  [FilterTypes.PRESENT]: (events) => [...events].filter(({ dateFrom, dateTo }) => {
+  [FilterType.EVERYTHING]: (events) => [...events],
+  [FilterType.FUTURE]: (events) => [...events].filter(({ dateFrom }) => dayjs(dateFrom).isAfter(now)),
+  [FilterType.PRESENT]: (events) => [...events].filter(({ dateFrom, dateTo }) => {
     const start = dayjs(dateFrom);
     const end = dayjs(dateTo);
     return start.isBefore(now) && end.isAfter(now);
   }),
-  [FilterTypes.PAST]: (events) => events.filter(({ dateTo }) => dayjs(dateTo).isBefore(now)),
+  [FilterType.PAST]: (events) => events.filter(({ dateTo }) => dayjs(dateTo).isBefore(now)),
 };
 
 function getFilteredSelectedOffers(event, typeOffers, updatedOffers = []) {

@@ -3,7 +3,7 @@ import SortView from '../view/sort-view';
 import { remove, render, RenderPosition } from '../framework/render';
 import EmptyListView from '../view/empty-list-view';
 import { isEmpty, sortEvents, filter } from '../utils';
-import { DEFAULT_FILTER_TYPE, FilterTypes, SortType, UpdateType, UserAction } from '../const';
+import { DEFAULT_FILTER_TYPE, FilterType, SortType, UpdateType, UserAction } from '../const';
 import EventPresenter from './event-presenter';
 import NewEventPresenter from './new-event-presenter';
 import LoadingMessageView from '../view/loading-message-view';
@@ -72,7 +72,7 @@ export default class TripPresenter {
 
   createEvent() {
     this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterTypes.EVERYTHING);
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
 
     if (this.#activePresenter) {
       this.#activePresenter.destroy();

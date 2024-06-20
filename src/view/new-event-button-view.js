@@ -9,7 +9,7 @@ function createNewEventButtonTemplate() {
   );
 }
 
-export default class NewButtonView extends AbstractView {
+export default class NewEventButtonView extends AbstractView {
   #handleButtonClick = null;
 
   constructor({ onNewButtonClick }) {
